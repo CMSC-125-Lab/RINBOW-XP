@@ -1,6 +1,9 @@
+package com.rinbowxp.app;
+
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -21,22 +24,24 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 
-public class RulesPage extends JPanel implements MouseListener{
+public class ContactPagePanel extends JPanel implements MouseListener{
     private JPanel cardPanel;
     private CardLayout cardLayout;
     private Image bg_image;
     private JPanel upperPanel, lowerPanel;
-    private JLabel title, homePageButton, contentPageButton, contactPageButton, exitButtonLabel, minimizeButtonLabel, gamedescriptionButton, leaderboardsButton, settingsPanelLabel;
+    private JLabel title, homePageButton, contentPageButton, contactPageButton, exitButtonLabel, minimizeButtonLabel;
     private Font customFont = new Font("Arial", Font.PLAIN, 21);
     private Font boldCustomFont = new Font("Arial", Font.BOLD, 21);
     private Font titleFont = new Font("Arial", Font.BOLD, 56);
     private ImageIcon exitButton, exitButtonClicked, minimizeButton, minimizeButtonClicked;
 
+    private JLabel github1, github2, github3, github4, github5, github6;
+    private JLabel email1, email2, email3, email4;
     private Dimension frameDimension;
 
     private ResourceManager resourceManager;
 
-    public RulesPage(CardLayout cardLayout, JPanel cardPanel, ResourceManager resourceManager,
+    public ContactPagePanel(CardLayout cardLayout, JPanel cardPanel, ResourceManager resourceManager,
                             Dimension frameDimension){
         this.cardLayout = cardLayout;
         this.cardPanel = cardPanel;
@@ -81,12 +86,12 @@ public class RulesPage extends JPanel implements MouseListener{
 
         contentPageButton = new JLabel("Rules");
         contentPageButton.setForeground(java.awt.Color.black);
-        contentPageButton.setFont(boldCustomFont);
+        contentPageButton.setFont(customFont);
         contentPageButton.addMouseListener(this);
 
         contactPageButton = new JLabel("Developers");
         contactPageButton.setForeground(java.awt.Color.black);
-        contactPageButton.setFont(customFont);
+        contactPageButton.setFont(boldCustomFont);
         contactPageButton.addMouseListener(this);
 
         exitButton = resourceManager.getImageIcon("Exit Button");
@@ -159,15 +164,116 @@ public class RulesPage extends JPanel implements MouseListener{
     }
 
     private void setLowerPanel() {
+        GridBagConstraints gbc = new GridBagConstraints();
         lowerPanel = new JPanel();
         lowerPanel.setOpaque(false);
         lowerPanel.setLayout(new GridBagLayout());
 
-        JLabel title = new JLabel("RULES");
+        JLabel title = new JLabel("CONTACT");
         title.setForeground(new Color(0x0057cc));
         title.setFont(titleFont);
-        lowerPanel.add(title);
-        
+
+        Font smallerFont = customFont.deriveFont(Font.PLAIN, (int) (frameDimension.getHeight()/36.7));
+        // For Contact 1
+        JLabel name1 = new JLabel("ROLF GARCES");
+        github1 = new JLabel("rolpppp");
+        email1 = new JLabel("rgarces@up.edu.ph");
+        name1.setFont(smallerFont);
+        github1.setFont(smallerFont);
+        email1.setFont(smallerFont);
+        github1.addMouseListener(this);
+        email1.addMouseListener(this);
+
+        // For Contact 2
+        JLabel name2 = new JLabel("NORMAN EULIN");
+        github2 = new JLabel("normaneulin");
+        email2 = new JLabel("nceulin1@up.edu.ph");
+        name2.setFont(smallerFont);
+        github2.setFont(smallerFont);
+        email2.setFont(smallerFont);
+        github2.addMouseListener(this);
+        email2.addMouseListener(this);
+
+        // For Contact 3
+        JLabel name3 = new JLabel("GIAN TONGZON");
+        github3 = new JLabel("giangelo19");
+        email3 = new JLabel("gatongzon@up.edu.ph");
+        name3.setFont(smallerFont);
+        github3.setFont(smallerFont);
+        email3.setFont(smallerFont);
+        github3.addMouseListener(this);
+        email3.addMouseListener(this);
+
+        // For Contact 4
+        JLabel name4 = new JLabel("VANCE ORTEGA");
+        github4 = new JLabel("MoresVance");
+        email4 = new JLabel("mcortega@up.edu.ph");
+        name4.setFont(smallerFont);
+        github4.setFont(smallerFont);
+        email4.setFont(smallerFont);
+        github4.addMouseListener(this);
+        email4.addMouseListener(this);
+
+        gbc.insets = new Insets(0, 0, (int) (frameDimension.getHeight()/120), 0);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 3;
+        gbc.anchor = GridBagConstraints.NORTH;
+        gbc.ipady = 20;
+
+        lowerPanel.add(title, gbc);
+
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.SOUTH;
+        gbc.gridy = 1;
+        gbc.ipady = 3;
+
+        gbc.insets = new Insets((int) (frameDimension.getHeight()/49), (int) (frameDimension.getWidth()/55), 0, (int) (frameDimension.getWidth()/55));
+        lowerPanel.add(name1, gbc);
+
+        gbc.gridx = 1;
+        lowerPanel.add(github1, gbc);
+
+        gbc.gridx = 2;
+        lowerPanel.add(email1, gbc);
+
+        gbc.insets = new Insets((int) (frameDimension.getHeight()/73), (int) (frameDimension.getWidth()/55), 0, (int) (frameDimension.getWidth()/55));
+        gbc.gridy = 2;
+
+        gbc.gridx = 0;
+        lowerPanel.add(name2, gbc);
+
+        gbc.gridx = 1;
+        lowerPanel.add(github2, gbc);
+
+        gbc.gridx = 2;
+        lowerPanel.add(email2, gbc);
+
+        gbc.gridy = 3;
+
+        gbc.gridx = 0;
+        lowerPanel.add(name3, gbc);
+
+        gbc.gridx = 1;
+        lowerPanel.add(github3, gbc);
+
+        gbc.gridx = 2;
+        lowerPanel.add(email3, gbc);
+
+        gbc.gridy = 4;
+
+        gbc.gridx = 0;
+        lowerPanel.add(name4, gbc);
+
+        gbc.gridx = 1;
+        lowerPanel.add(github4, gbc);
+
+        gbc.gridx = 2;
+        lowerPanel.add(email4, gbc);
+
+        gbc.gridy = 5;
+        gbc.weighty = 1.0;
+        lowerPanel.add(new JLabel(""), gbc);
 
     }
 
@@ -212,7 +318,56 @@ public class RulesPage extends JPanel implements MouseListener{
         else if (e.getSource() == contactPageButton) {
             cardLayout.show(cardPanel, "Contact Page");
         }
-         else if (e.getSource() == title){
+        else if (e.getSource() == github1){
+            Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+            if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+                try {
+                    desktop.browse(new URI("https://github.com/rolpppp"));
+                }
+                catch (Exception e1) {
+                    System.out.println("Desktop browsing Failed.");
+                    e1.printStackTrace();
+                }
+            }
+        }
+        else if (e.getSource() == github2){
+            Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+            if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+                try {
+                    desktop.browse(new URI("https://github.com/normaneulin"));
+                }
+                catch (Exception e1) {
+                    System.out.println("Desktop browsing Failed.");
+                    e1.printStackTrace();
+                }
+            }
+
+        }
+        else if (e.getSource() == github3){
+            Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+            if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+                try {
+                    desktop.browse(new URI("https://github.com/giangelo19"));
+                }
+                catch (Exception e1) {
+                    System.out.println("Desktop browsing Failed.");
+                    e1.printStackTrace();
+                }
+            }
+
+        }
+        else if (e.getSource() == github4){
+            Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+            if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+                try {
+                    desktop.browse(new URI("https://github.com/MoresVance"));
+                } catch (Exception e1) {
+                    System.out.println("Desktop browsing Failed.");
+                    e1.printStackTrace();
+                }
+            }
+
+        } else if (e.getSource() == title){
             Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
             if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
                 try {
@@ -238,10 +393,10 @@ public class RulesPage extends JPanel implements MouseListener{
     @Override
     public void mouseEntered(MouseEvent e) {
         if (e.getSource() == contentPageButton) {
-            contentPageButton.setFont(customFont);
+            contentPageButton.setFont(boldCustomFont);
         }
         else if (e.getSource() == contactPageButton) {
-            contactPageButton.setFont(boldCustomFont);
+            contactPageButton.setFont(customFont);
         }
         else if (e.getSource() == homePageButton) {
             homePageButton.setFont(boldCustomFont);
@@ -252,6 +407,9 @@ public class RulesPage extends JPanel implements MouseListener{
         else if (e.getSource() == minimizeButtonLabel) {
             minimizeButtonLabel.setIcon(minimizeButtonClicked);
         }
+        else if (e.getSource() == github1 || e.getSource() == github2 || e.getSource() == github3 || e.getSource() == github4 || e.getSource() == github5 || e.getSource() == github6) {
+            ((Component) e.getSource()).setForeground(java.awt.Color.blue);
+        } 
 
     }
 
@@ -266,14 +424,6 @@ public class RulesPage extends JPanel implements MouseListener{
         else if (e.getSource() == homePageButton){
             homePageButton.setFont(customFont);
 
-        }else if(e.getSource() == gamedescriptionButton){
-            gamedescriptionButton.setFont(customFont);
-        }else if(e.getSource() == leaderboardsButton){
-            leaderboardsButton.setFont(customFont);
-
-        }else if(e.getSource() == settingsPanelLabel){
-            settingsPanelLabel.setFont(customFont);
-
         }
         else if (e.getSource() == exitButtonLabel) {
             exitButtonLabel.setIcon(exitButton);
@@ -281,5 +431,8 @@ public class RulesPage extends JPanel implements MouseListener{
         else if (e.getSource() == minimizeButtonLabel) {
             minimizeButtonLabel.setIcon(minimizeButton);       
         }
+        else if (e.getSource() == github1 || e.getSource() == github2 || e.getSource() == github3 || e.getSource() == github4 || e.getSource() == github5 || e.getSource() == github6) {
+            ((Component) e.getSource()).setForeground(java.awt.Color.black);
+        } 
     }
 }

@@ -1,3 +1,5 @@
+package com.rinbowxp.app;
+
 import java.awt.*;
 
 import javax.swing.JFrame;

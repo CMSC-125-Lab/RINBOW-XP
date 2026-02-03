@@ -1,3 +1,4 @@
+package com.rinbowxp.app;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -7,15 +8,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Objects;
 
 /**
  * Future refactor for loading resources into the app.
  */
 
 public class ResourceManager {
-    protected static final String FILES_PATH = "files/";
-    protected static final String KNOWLEDGEBASE_PATH = "MCQ/";
+    protected static final String FILES_PATH = "com/rinbowxp/app/resources/files/";
     private Cursor cursor;
     private HashMap<String, ImageIcon> imageIconHashMap;
     private Image logo;
@@ -132,25 +131,18 @@ public class ResourceManager {
     }
 
     public InputStream getStreamFromFiles(String file) {
-        return Objects.requireNonNull(
-            getClass().getResourceAsStream(
-                "/" + FILES_PATH + file
-            )
-        );
+        System.err.println(getClass());
+        InputStream is = getClass().getClassLoader().getResourceAsStream(FILES_PATH + file);
+        if (is == null) {
+            throw new RuntimeException("Resource not found on classpath: " + FILES_PATH + file);
+        }
+        return is;
     }
 
     public URL getURLFromFiles(String file) {
-        return Objects.requireNonNull(
-            getClass().getClassLoader().getResource(
-                FILES_PATH + file
-            )
-        );
-    }
-
-    public URL getFromKnowledgeBase(String file) {
-        URL url = getClass().getClassLoader().getResource(KNOWLEDGEBASE_PATH + file);
+        URL url = getClass().getClassLoader().getResource(FILES_PATH + file);
         if (url == null) {
-            System.err.println("⚠️ Resource not found: " + KNOWLEDGEBASE_PATH + file);
+            throw new RuntimeException("Resource not found on classpath: " + FILES_PATH + file);
         }
         return url;
     }
