@@ -18,7 +18,7 @@ public class WordPoolDemo {
         Set<String> usedWords = new HashSet<>();
         for (int i = 0; i < 5; i++){
             WordEntry w = provider.nextWord(Optional.of(Difficulty.EASY));
-            IO.println((i+1) + ". " + w.term() + " clue: " + w.clue());
+            IO.println((i+1) + ". " + w.term() + " \t clue: " + w.clue());
             usedWords.add(w.term());
         }
         IO.println("Unique words: " + usedWords.size() + "/5 (should be 5)");
@@ -29,7 +29,7 @@ public class WordPoolDemo {
         Set<String> secondBatch = new HashSet<>();
         for (int i = 0; i < 5; i++){
             WordEntry w = provider.nextWord(Optional.of(Difficulty.EASY));
-            IO.println((i+1) + ". " + w.term() + " clue: " + w.clue());
+            IO.println((i+1) + ". " + w.term() + " \t clue: " + w.clue());
             secondBatch.add(w.term());
         }
         IO.println("Unique words in second batch: " + secondBatch.size() + "/5");
@@ -45,7 +45,7 @@ public class WordPoolDemo {
         IO.println("Pool reset! Getting 3 EASY words...");
         for (int i = 0; i < 3; i++){
             WordEntry w = provider.nextWord(Optional.of(Difficulty.EASY));
-            IO.println((i+1) + ". " + w.term() + " clue: " + w.clue());
+            IO.println((i+1) + ". " + w.term() + " \t clue: " + w.clue());
         }
         IO.println();
         
@@ -54,13 +54,13 @@ public class WordPoolDemo {
         IO.println("3 MEDIUM words:");
         for (int i = 0; i < 3; i++){
             WordEntry w = provider.nextWord(Optional.of(Difficulty.MEDIUM));
-            IO.println((i+1) + ". " + w.term() + " (" + w.difficulty() + ")" + " clue: " + w.clue());
+            IO.println((i+1) + ". " + w.term() + " (" + w.difficulty() + ")" + " \t clue: " + w.clue());
         }
         IO.println();
         IO.println("3 HARD words:");
         for (int i = 0; i < 3; i++){
             WordEntry w = provider.nextWord(Optional.of(Difficulty.HARD));
-            IO.println((i+1) + ". " + w.term() + " (" + w.difficulty() + ")" + " clue: " + w.clue());
+            IO.println((i+1) + ". " + w.term() + " (" + w.difficulty() + ")" + " \t clue: " + w.clue());
         }
         
         IO.println();

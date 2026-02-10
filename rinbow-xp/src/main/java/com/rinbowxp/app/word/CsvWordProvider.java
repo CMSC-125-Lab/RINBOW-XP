@@ -91,7 +91,7 @@ public final class CsvWordProvider implements WordProvider {
         }
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-            CSVParser parser = CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).setTrim(true).build().parse(reader)){
+            CSVParser parser = CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).setTrim(true).get().parse(reader)){
             List<WordEntry> list = new ArrayList<>();
             for (CSVRecord rec : parser){
                 Difficulty diff = Difficulty.fromCsv(rec.get("Difficulty"));
