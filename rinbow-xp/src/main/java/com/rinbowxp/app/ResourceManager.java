@@ -112,7 +112,7 @@ public class ResourceManager {
         );
         imageIconHashMap.put(
             "Keyboard",
-            new ImageIcon(getURLFromFiles("keyboard.jpeg"))
+            new ImageIcon(getURLFromFiles("keyboard2.png"))
         );
         System.out.println("Image Icons loaded successfully!");
     }
