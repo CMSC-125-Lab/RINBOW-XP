@@ -27,10 +27,11 @@ public class MainFrame extends JFrame{
         MainPagePanel homePagePanel = new MainPagePanel(cardLayout, cardPanel, resourceManager, new Dimension(frameWidth, frameHeight));  
         ContactPagePanel contactPagePanel = new ContactPagePanel(cardLayout, cardPanel, resourceManager, new Dimension(frameWidth, frameHeight));
         RulesPage rulesPage = new RulesPage(cardLayout, cardPanel, resourceManager, new Dimension(frameWidth, frameHeight));
+        GamePanel gamePanel = new GamePanel(cardLayout, cardPanel, resourceManager, new Dimension(frameWidth, frameHeight));
         cardPanel.add(homePagePanel, "Home Page");
         cardPanel.add(contactPagePanel, "Contact Page");
         cardPanel.add(rulesPage, "Rules Page");
-
+        cardPanel.add(gamePanel, "Game Panel");
         return cardPanel;
     }
 

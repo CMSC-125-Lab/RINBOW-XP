@@ -28,7 +28,7 @@ public class RulesPage extends JPanel implements MouseListener{
     private CardLayout cardLayout;
     private Image bg_image;
     private JPanel upperPanel, lowerPanel;
-    private JLabel title, homePageButton, contentPageButton, contactPageButton, exitButtonLabel, minimizeButtonLabel, gamedescriptionButton, leaderboardsButton, settingsPanelLabel;
+    private JLabel title, homePageButton, contentPageButton, contactPageButton, exitButtonLabel, minimizeButtonLabel;
     private Font customFont = new Font("Arial", Font.PLAIN, 21);
     private Font boldCustomFont = new Font("Arial", Font.BOLD, 21);
     private Font titleFont = new Font("Arial", Font.BOLD, 56);
@@ -267,15 +267,6 @@ public class RulesPage extends JPanel implements MouseListener{
         }
         else if (e.getSource() == homePageButton){
             homePageButton.setFont(customFont);
-
-        }else if(e.getSource() == gamedescriptionButton){
-            gamedescriptionButton.setFont(customFont);
-        }else if(e.getSource() == leaderboardsButton){
-            leaderboardsButton.setFont(customFont);
-
-        }else if(e.getSource() == settingsPanelLabel){
-            settingsPanelLabel.setFont(customFont);
-
         }
         else if (e.getSource() == exitButtonLabel) {
             exitButtonLabel.setIcon(exitButton);

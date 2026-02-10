@@ -21,9 +21,9 @@ public class ResourceManager {
 
     private Font cousineRegular, cousineBold, anonymousProBold;
     public ResourceManager() {
-        IO.println("Loading resources...");
+        System.out.println("Loading resources...");
         loadResources();
-        IO.println("Resources loaded successfully!");
+        System.out.println("Resources loaded successfully!");
     }
 
     private void loadResources() {
@@ -31,7 +31,7 @@ public class ResourceManager {
         try {
             loadFonts();
         } catch (IOException | FontFormatException e) {
-            IO.println("ERROR: Fonts failed to load");
+            System.out.println("ERROR: Fonts failed to load");
             throw new RuntimeException(e);
         }
         imageIconHashMap = new HashMap<>();
@@ -39,7 +39,7 @@ public class ResourceManager {
     }
 
     private void loadFonts() throws IOException, FontFormatException {
-        IO.println("Loading Fonts...");
+        System.out.println("Loading Fonts...");
         cousineRegular = Font.createFont(
             Font.TRUETYPE_FONT,
             getStreamFromFiles("Cousine-Regular.ttf")
@@ -55,12 +55,11 @@ public class ResourceManager {
             getStreamFromFiles("AnonymousPro-Bold.ttf")
         );
         anonymousProBold = anonymousProBold.deriveFont(Font.BOLD, 50);
-        IO.println("Done loading fonts!");
+        System.out.println("Done loading fonts!");
     }
 
     private void loadImages() {
-        IO.println("Loading image icons...");
-
+        System.out.println("Loading image icons...");
         imageIconHashMap.put(
             "Contact Panel BG",
             new ImageIcon(getURLFromFiles("contact-bg.png"))
@@ -111,7 +110,11 @@ public class ResourceManager {
             "Back Button Clicked",
             new ImageIcon(getURLFromFiles("backButton_Clicked.jpg"))
         );
-        IO.println("Image Icons loaded successfully!");
+        imageIconHashMap.put(
+            "Keyboard",
+            new ImageIcon(getURLFromFiles("keyboard.jpeg"))
+        );
+        System.out.println("Image Icons loaded successfully!");
     }
 
     private void loadCursor() {
@@ -125,7 +128,7 @@ public class ResourceManager {
             );
         }
         catch (IOException e) {
-            IO.println("ERROR: Custom Cursor failed to load");
+            System.out.println("ERROR: Custom Cursor failed to load");
             throw new RuntimeException(e);
         }
     }

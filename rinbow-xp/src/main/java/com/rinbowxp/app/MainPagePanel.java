@@ -221,7 +221,7 @@ public class MainPagePanel extends JPanel implements MouseListener{
     @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getSource() == startButtonLabel) {
-           
+           cardLayout.show(cardPanel, "Game Panel");
         }
         else if (e.getSource() == minimizeButtonLabel) {
             System.out.println("Minimize Button Pressed");
