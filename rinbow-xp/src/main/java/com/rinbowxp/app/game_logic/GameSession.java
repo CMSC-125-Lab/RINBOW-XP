@@ -1,28 +1,37 @@
 package com.rinbowxp.app.game_logic;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
+import com.rinbowxp.app.word.*;
+
+import com.rinbowxp.app.word.CsvWordProvider;
+import com.rinbowxp.app.word.WordProvider;
 
 public class GameSession {
     // Temporary placeholders - will be replaced with actual classes later
-    private String secretWord;  // TODO: Replace with WordProvider
+    private WordProvider provider; 
+    private WordEntry word;
+    private String secretWord;  
     private Set<String> guessed;
     private int wrongCount;
-    private String status;  // TODO: Replace with GameStatus enum (RUNNING, WON, LOST)
+    private GameStatus status;
     private int damageLevel;  // TODO: Replace with DamageStatus
-    private int maxWrongAttempts;  // TODO: Replace with GameRules
+    private GameRules rules;
     private int currentRound;  // TODO: Replace with GameRound
     
     /**
      * Constructor initializes a new game session
      */
     public GameSession() {
-        this.secretWord = "HANGMAN";  // Temporary hardcoded word
+        this.provider = new CsvWordProvider("../resources/word-dict/terms.csv");
+        this.word = provider.nextWord(Optional.of(Difficulty.EASY));
+        this.secretWord = word.term();
         this.guessed = new HashSet<>();
         this.wrongCount = 0;
-        this.status = "RUNNING";
+        this.status = GameStatus.RUNNING;
         this.damageLevel = 0;
-        this.maxWrongAttempts = 6;
+        this.rules = new GameRules(8);
         this.currentRound = 1;
     }
     
@@ -34,8 +43,8 @@ public class GameSession {
     public boolean makeGuess(String letter) {
         letter = letter.toUpperCase();
         
-        if (guessed.contains(letter)) {
-            return false;  // Already guessed
+        if (!rules.validateGuess(letter, guessed)) {
+            return false;  // Invalid or already guessed
         }
         
         guessed.add(letter);
@@ -69,11 +78,11 @@ public class GameSession {
      */
     private void updateStatus() {
         if (isWordComplete()) {
-            status = "WON";
-        } else if (wrongCount >= maxWrongAttempts) {
-            status = "LOST";
+            status = GameStatus.WON;
+        } else if (wrongCount >= rules.getMaxWrongAttempts()) {
+            status = GameStatus.LOST;
         } else {
-            status = "RUNNING";
+            status = GameStatus.RUNNING;
         }
     }
     
@@ -84,7 +93,7 @@ public class GameSession {
         this.secretWord = "HANGMAN";  // TODO: Get from WordProvider
         this.guessed.clear();
         this.wrongCount = 0;
-        this.status = "RUNNING";
+        this.status = GameStatus.RUNNING;
         this.damageLevel = 0;
         this.currentRound++;
     }
@@ -102,7 +111,7 @@ public class GameSession {
         return wrongCount;
     }
     
-    public String getStatus() {
+    public GameStatus getStatus() {
         return status;
     }
     
@@ -115,7 +124,11 @@ public class GameSession {
     }
     
     public int getMaxWrongAttempts() {
-        return maxWrongAttempts;
+        return rules.getMaxWrongAttempts();
+    }
+    
+    public GameRules getRules() {
+        return rules;
     }
     
     /**
