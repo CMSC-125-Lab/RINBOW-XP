@@ -7,6 +7,8 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -24,12 +26,25 @@ public class Keyboard extends JPanel{
     String row2 = "ASDFGHJKL";
     String row3 = "ZXCVBNM";
     String[] rows = { row1, row2, row3};
+    private double scale;
+    private SpriteTransition spriteTransition;
 
     public Keyboard() {
+        this(1.8);  // Default scale
+    }
+
+    public Keyboard(double scale) {
+        this(scale, null);  // No sprite transition
+    }
+
+    public Keyboard(double scale, SpriteTransition spriteTransition) {
+        this.scale = scale;
+        this.spriteTransition = spriteTransition;
         setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
         setOpaque(false);
-        int scaledWidth = (int) Math.round(keyboardIcon.getIconWidth() * 1.8);
-        int scaledHeight = (int) Math.round(keyboardIcon.getIconHeight() * 1.8);
+        int scaledWidth = (int) Math.round(keyboardIcon.getIconWidth() * scale);
+        int scaledHeight = (int) Math.round(keyboardIcon.getIconHeight() * scale);
+        int buttonSize = (int) Math.round(18 * scale);
         System.out.println("Scaled dimensions: " + scaledWidth + "x" + scaledHeight);
         setPreferredSize(new java.awt.Dimension(scaledWidth, scaledHeight));
 
@@ -47,8 +62,9 @@ public class Keyboard extends JPanel{
         // Padding between Keyboard row and Keyboard JPanel border
         row1Panel.setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0)); // Padding between Keyboard row and Keyboard JPanel border
         row1Panel.setOpaque(false);
+        row1Panel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
         for (int i = 0; i < row1.length(); i++) {
-            JButton button = createKeyButton();
+            JButton button = createKeyButton(buttonSize);
             row1Panel.add(button);
         }
         keyboardPanel.add(row1Panel, gbc);
@@ -58,8 +74,9 @@ public class Keyboard extends JPanel{
         // Padding between Keyboard row and Keyboard JPanel border (Also padding between row 1 and row 2)
         row2Panel.setBorder(BorderFactory.createEmptyBorder(10, 13, 0, 0));
         row2Panel.setOpaque(false);
+        row2Panel.setBorder(BorderFactory.createLineBorder(Color.BLUE, 2));
         for (int i = 0; i < row2.length(); i++) {
-            JButton button = createKeyButton();
+            JButton button = createKeyButton(buttonSize);
             row2Panel.add(button);
         }
         gbc.gridy = 1;
@@ -70,8 +87,9 @@ public class Keyboard extends JPanel{
         // Padding between Keyboard row and Keyboard JPanel border (Also padding between row 2 and row 3)
         row3Panel.setBorder(BorderFactory.createEmptyBorder(12, 38, 0, 0));
         row3Panel.setOpaque(false);
+        row3Panel.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
         for (int i = 0; i < row3.length(); i++) {
-            JButton button = createKeyButton();
+            JButton button = createKeyButton(buttonSize);
             row3Panel.add(button);
         }
         gbc.gridy = 2;
@@ -80,7 +98,7 @@ public class Keyboard extends JPanel{
         add(keyboardPanel);
     }
 
-    private JButton createKeyButton() {
+    private JButton createKeyButton(int size) {
         JButton button = new JButton() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -93,13 +111,25 @@ public class Keyboard extends JPanel{
                 super.paintComponent(g);
             }
         };
-        button.setPreferredSize(new java.awt.Dimension(40, 40));
+        button.setPreferredSize(new java.awt.Dimension(size, size));
         button.setContentAreaFilled(false);
         button.setBorderPainted(false);
         button.setFocusPainted(false);
         button.setOpaque(false);
         button.setRolloverEnabled(true);
         button.setBorder(new RoundedBorder(10));
+        
+        // Add listener to advance sprite transition when button is clicked
+        if (spriteTransition != null) {
+            button.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    spriteTransition.next();
+
+                }
+            });
+        }
+        
         return button;
     }
 

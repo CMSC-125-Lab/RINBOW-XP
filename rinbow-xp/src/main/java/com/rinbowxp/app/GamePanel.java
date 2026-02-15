@@ -20,6 +20,7 @@ import java.net.URI;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -29,7 +30,7 @@ public class GamePanel extends JPanel implements MouseListener{
     private JPanel cardPanel;
     private CardLayout cardLayout;
     private Image bg_image;
-    private JPanel upperPanel, lowerPanel;
+    private JPanel upperPanel, lowerPanel, lowerBorderPanel;
     private JLabel title, homePageButton, exitButtonLabel, minimizeButtonLabel, gamedescriptionButton;
     private Font customFont = new Font("Arial", Font.PLAIN, 21);
     private Font boldCustomFont = new Font("Arial", Font.BOLD, 21);
@@ -39,6 +40,7 @@ public class GamePanel extends JPanel implements MouseListener{
     private Dimension frameDimension;
 
     private ResourceManager resourceManager;
+    private SpriteTransition spriteTransition;
 
     public GamePanel(CardLayout cardLayout, JPanel cardPanel, ResourceManager resourceManager,
                             Dimension frameDimension){
@@ -48,8 +50,15 @@ public class GamePanel extends JPanel implements MouseListener{
         this.frameDimension = frameDimension;
 
         bg_image = resourceManager.getImageIcon("Contact Panel BG").getImage();
+        
+        // Initialize sprite transition
+        spriteTransition = new SpriteTransition(resourceManager);
+
+        // PNG transition speed
+        spriteTransition.setTransitionSpeed(20);
 
         this.setLayout(new BorderLayout());
+        this.setOpaque(false);
 
         customFont = resourceManager.getCousineRegular();
         customFont = customFont.deriveFont(Font.PLAIN, (int) frameDimension.getHeight()/25);
@@ -60,10 +69,12 @@ public class GamePanel extends JPanel implements MouseListener{
 
         setUpperPanel();
         setLowerPanel();
+        setLowerBorderPanel();
 
         // add the upper and lower panels
         add(upperPanel, BorderLayout.NORTH);
         add(lowerPanel, BorderLayout.CENTER);
+        add(lowerBorderPanel, BorderLayout.SOUTH);
 
     }
 
@@ -116,7 +127,7 @@ public class GamePanel extends JPanel implements MouseListener{
         gbc.gridx = 0;
         gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets((int) frameDimension.getHeight()/25, (int) (frameDimension.getWidth()/27.5), 0, 0);
+        gbc.insets = new Insets((int) frameDimension.getHeight()/50, (int) (frameDimension.getWidth()/27.5), 0, 0);
         upperPanel.add(title, gbc);
 
         gbc.gridx = 1;
@@ -155,25 +166,114 @@ public class GamePanel extends JPanel implements MouseListener{
     private void setLowerPanel() {
     lowerPanel = new JPanel();
     lowerPanel.setLayout(new GridBagLayout());
+    lowerPanel.setOpaque(false);
 
     lowerPanel.setBorder(BorderFactory.createEmptyBorder(
         0,
-        (int)(frameDimension.getWidth() / 32),
+        (int)(frameDimension.getWidth() / 45),
         0,
-        (int)(frameDimension.getWidth() / 32)
+        (int)(frameDimension.getWidth() / 45)
     ));
 
     // Left Panel (60%)
     JPanel leftPanel = new JPanel();
-    leftPanel.setOpaque(true);
-    leftPanel.setBackground(Color.RED); // Color added for visibility during testing
-    leftPanel.setLayout(new FlowLayout());
-    leftPanel.add(new Keyboard());
+    leftPanel.setOpaque(false);
+    leftPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+    leftPanel.setLayout(new GridBagLayout());
 
-    // Right Panel (40%)
-    JPanel rightPanel = new JPanel();
-    rightPanel.setOpaque(true);
-    rightPanel.setBackground(Color.BLUE); // Color added for visibility during testing
+    GridBagConstraints leftGbc = new GridBagConstraints();
+    leftGbc.gridx = 0;
+    leftGbc.fill = GridBagConstraints.BOTH;
+    leftGbc.weightx = 1.0;
+
+    // Monitor Panel (NORTH) - fills all available space
+    JPanel monitorPanel = new JPanel();
+    monitorPanel.setOpaque(false);
+    monitorPanel.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+    leftGbc.gridy = 0;
+    leftGbc.weighty = 1.0;  // Expand to fill all space
+    leftGbc.fill = GridBagConstraints.BOTH;  // Fill both horizontally and vertically
+    leftPanel.add(monitorPanel, leftGbc);
+
+    // Keyboard Panel (SOUTH) - only as tall as keyboard
+    JPanel keyboardPanel = new JPanel();
+    keyboardPanel.setOpaque(false);
+    keyboardPanel.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
+    keyboardPanel.setLayout(new GridBagLayout());
+    GridBagConstraints kbc = new GridBagConstraints();
+    kbc.anchor = GridBagConstraints.CENTER;
+    keyboardPanel.add(new Keyboard(1.5, spriteTransition), kbc);  // Pass spriteTransition to Keyboard
+    leftGbc.gridy = 1;
+    leftGbc.weighty = 0;  // Don't expand vertically - only keyboard's height
+    leftGbc.fill = GridBagConstraints.HORIZONTAL;
+    leftPanel.add(keyboardPanel, leftGbc);
+
+    // Right Panel (40%) - Square with height = lowerPanel height
+    JPanel rightPanel = new JPanel() {
+        @Override
+        public Dimension getPreferredSize() {
+            int height = lowerPanel.getHeight();
+            return new Dimension(height, height);
+        }
+    };
+    rightPanel.setOpaque(false);
+    rightPanel.setBorder(BorderFactory.createLineBorder(Color.BLUE, 2));
+    rightPanel.setLayout(new java.awt.BorderLayout());
+    
+    // Add sprite display button - transparent, non-clickable, scales via paintIcon to preserve GIF animation
+    JButton spriteButton = new JButton() {
+        @Override
+        protected void paintComponent(Graphics g) {
+            // Do NOT call super.paintComponent(g) to avoid filling background
+            setOpaque(false);
+            ImageIcon currentSprite = (ImageIcon) getIcon();
+            if (currentSprite == null) return;
+
+            int imgWidth = currentSprite.getIconWidth();
+            int imgHeight = currentSprite.getIconHeight();
+            int panelWidth = getWidth();
+            int panelHeight = getHeight();
+            if (panelWidth <= 0 || panelHeight <= 0 || imgWidth <= 0 || imgHeight <= 0) return;
+
+            double scale = Math.min((double) panelWidth / imgWidth, (double) panelHeight / imgHeight) * 0.95;
+            int scaledWidth = (int) Math.max(1, Math.round(imgWidth * scale));
+            int scaledHeight = (int) Math.max(1, Math.round(imgHeight * scale));
+            int x = (panelWidth - scaledWidth) / 2;
+            int y = (panelHeight - scaledHeight) / 2;
+
+            Graphics2D g2d = (Graphics2D) g.create();
+            try {
+                g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                g2d.translate(x, y);
+                g2d.scale(scaledWidth / (double) imgWidth, scaledHeight / (double) imgHeight);
+                // Paint the icon using ImageIcon so GIF frames animate
+                currentSprite.paintIcon(this, g2d, 0, 0);
+            } finally {
+                g2d.dispose();
+            }
+        }
+    };
+    // Make the button visually passive and non-interactive
+    spriteButton.setOpaque(false);
+    spriteButton.setContentAreaFilled(false);
+    spriteButton.setBorderPainted(false);
+    spriteButton.setFocusPainted(false);
+    spriteButton.setFocusable(false);
+    spriteButton.setRolloverEnabled(false);
+    // Do not add any action listeners; clicks do nothing
+    rightPanel.add(spriteButton, java.awt.BorderLayout.CENTER);
+
+    // Update the button's icon whenever the sprite changes
+    Runnable updateSprite = () -> {
+        ImageIcon icon = spriteTransition.getCurrentImage();
+        if (icon != null) {
+            spriteButton.setIcon(icon);
+            spriteButton.repaint();
+        }
+    };
+    spriteTransition.setOnFrameChange(updateSprite);
+    javax.swing.SwingUtilities.invokeLater(updateSprite);
 
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.gridy = 0;
@@ -185,10 +285,25 @@ public class GamePanel extends JPanel implements MouseListener{
     lowerPanel.add(leftPanel, gbc);
 
     gbc.gridx = 1;
-    gbc.weightx = 0.47;
+    gbc.weightx = 0;  // Don't expand horizontally
+    gbc.weighty = 0;  // Don't expand vertically
+    gbc.anchor = GridBagConstraints.CENTER;
+    gbc.fill = GridBagConstraints.NONE;  // Don't stretch
     lowerPanel.add(rightPanel, gbc);
 
 }
+
+    private void setLowerBorderPanel() {
+        lowerBorderPanel = new JPanel();
+        lowerBorderPanel.setOpaque(false);
+        lowerBorderPanel.setPreferredSize(new Dimension(0, (int)(frameDimension.getHeight() /10)));
+        lowerBorderPanel.setBorder(BorderFactory.createEmptyBorder(
+            (int)(frameDimension.getHeight() / 64),
+            (int)(frameDimension.getWidth() / 32),
+            (int)(frameDimension.getHeight() / 64),
+            (int)(frameDimension.getWidth() / 32)
+        ));
+    }
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -278,3 +393,5 @@ public class GamePanel extends JPanel implements MouseListener{
         }
     }
 }
+
+
