@@ -16,7 +16,7 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.MouseListener;    
 import java.net.URI;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
