@@ -8,6 +8,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
+import javax.imageio.ImageReadParam;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
+import java.util.Iterator;
 
 /**
  * Future refactor for loading resources into the app.
@@ -16,8 +20,11 @@ import java.util.HashMap;
 public class ResourceManager {
     protected static final String FILES_PATH = "com/rinbowxp/app/resources/files/";
     private Cursor cursor;
-    private HashMap<String, ImageIcon> imageIconHashMap;
+    private HashMap<String, ImageIcon> imageIconHashMap; // strong cache for UI assets & GIFs
+    private HashMap<String, java.lang.ref.SoftReference<ImageIcon>> transitionCache; // soft cache for large PNG frames
     private Image logo;
+    // Limit decoded PNG transition frame size to avoid huge memory use (OOM)
+    private static final int TRANSITION_MAX_DIM = 600; // pixels (fits right panel ~500)
 
     private Font cousineRegular, cousineBold, anonymousProBold;
     public ResourceManager() {
@@ -35,6 +42,7 @@ public class ResourceManager {
             throw new RuntimeException(e);
         }
         imageIconHashMap = new HashMap<>();
+        transitionCache = new HashMap<>();
         loadImages();
     }
 
@@ -114,6 +122,7 @@ public class ResourceManager {
             "Keyboard",
             new ImageIcon(getURLFromFiles("keyboard2.png"))
         );
+        
         System.out.println("Image Icons loaded successfully!");
     }
 
@@ -149,6 +158,40 @@ public class ResourceManager {
         }
         return url;
     }
+    
+    /**
+     * Decode a PNG from classpath with subsampling to cap max dimension.
+     * This avoids decoding massive 6k images into memory.
+     */
+    private ImageIcon loadScaledPngIcon(String filePath, int maxDim) {
+        InputStream is = getStreamFromFiles(filePath);
+        try (ImageInputStream iis = ImageIO.createImageInputStream(is)) {
+            Iterator<ImageReader> readers = ImageIO.getImageReadersByFormatName("png");
+            if (!readers.hasNext()) {
+                throw new RuntimeException("No PNG ImageReader available");
+            }
+            ImageReader reader = readers.next();
+            try {
+                reader.setInput(iis, true, true);
+                int width = reader.getWidth(0);
+                int height = reader.getHeight(0);
+                int factor = 1;
+                if (width > maxDim || height > maxDim) {
+                    int fx = (int) Math.ceil(width / (double) maxDim);
+                    int fy = (int) Math.ceil(height / (double) maxDim);
+                    factor = Math.max(1, Math.max(fx, fy));
+                }
+                ImageReadParam param = reader.getDefaultReadParam();
+                param.setSourceSubsampling(factor, factor, 0, 0);
+                BufferedImage scaled = reader.read(0, param);
+                return new ImageIcon(scaled);
+            } finally {
+                reader.dispose();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read scaled PNG: " + filePath, e);
+        }
+    }
  
 
     public Cursor getCursor() {
@@ -172,9 +215,56 @@ public class ResourceManager {
     }
 
     public ImageIcon getImageIcon(String key) {
-        if(imageIconHashMap.get(key) == null){
-            throw new RuntimeException("ERROR: Key is not in Image Icon Hashmap!");
+        // Check if already cached
+        if (imageIconHashMap.containsKey(key)) {
+            ImageIcon cached = imageIconHashMap.get(key);
+            if (cached == null) {
+                throw new RuntimeException("ERROR: Key is not in Image Icon Hashmap!");
+            }
+            return cached;
         }
-        return imageIconHashMap.get(key);
+        
+        // Try to load sprite on-demand (lazy loading)
+        if (key.startsWith("stage") && !key.contains("/")) {
+            // It's a stage GIF (stage0, stage1, etc.)
+            try {
+                String stageName = key + ".gif";
+                ImageIcon icon = new ImageIcon(getURLFromFiles("sprites/" + stageName));
+                imageIconHashMap.put(key, icon);
+                return icon;
+            } catch (RuntimeException e) {
+                System.err.println("Failed to load sprite: " + key);
+                throw new RuntimeException("ERROR: Could not load sprite: " + key);
+            }
+        } else if (key.startsWith("transition-")) {
+            // It's a transition frame (transition-0/stage0_f1, etc.)
+            try {
+                // Check soft cache first
+                java.lang.ref.SoftReference<ImageIcon> ref = transitionCache.get(key);
+                if (ref != null) {
+                    ImageIcon cached = ref.get();
+                    if (cached != null) {
+                        return cached;
+                    }
+                }
+                String[] parts = key.split("/");
+                String transitionDir = parts[0];  // "transition-0"
+                String frameName = parts[1];      // "stage0_f1"
+                
+                // Handle typo in folder name for transition-0
+                String actualFolder = transitionDir.equals("transition-0") ? "tranistion-0" : transitionDir;
+                
+                String filePath = "sprites/" + actualFolder + "/" + frameName + ".png";
+                // Decode with subsampling to cap size and avoid heap bloat
+                ImageIcon icon = loadScaledPngIcon(filePath, TRANSITION_MAX_DIM);
+                transitionCache.put(key, new java.lang.ref.SoftReference<>(icon));
+                return icon;
+            } catch (RuntimeException e) {
+                System.err.println("Failed to load transition frame: " + key);
+                throw new RuntimeException("ERROR: Could not load transition: " + key);
+            }
+        }
+        
+        throw new RuntimeException("ERROR: Key is not in Image Icon Hashmap!");
     }
 }

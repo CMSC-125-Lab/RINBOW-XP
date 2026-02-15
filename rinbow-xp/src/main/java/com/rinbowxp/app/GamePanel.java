@@ -22,6 +22,7 @@ import java.net.URI;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -43,6 +44,7 @@ public class GamePanel extends JPanel implements MouseListener{
     private Dimension frameDimension;
 
     private ResourceManager resourceManager;
+    private SpriteTransition spriteTransition;
 
     public GamePanel(CardLayout cardLayout, JPanel cardPanel, ResourceManager resourceManager,
                             Dimension frameDimension){
@@ -52,6 +54,12 @@ public class GamePanel extends JPanel implements MouseListener{
         this.frameDimension = frameDimension;
 
         bg_image = resourceManager.getImageIcon("Contact Panel BG").getImage();
+        
+        // Initialize sprite transition
+        spriteTransition = new SpriteTransition(resourceManager);
+
+        // PNG transition speed
+        spriteTransition.setTransitionSpeed(20);
 
         this.setLayout(new BorderLayout());
 
@@ -223,11 +231,68 @@ public class GamePanel extends JPanel implements MouseListener{
     leftPanel.setMaximumSize(new Dimension(leftPanelWidth, Integer.MAX_VALUE));
 
     JPanel rightPanel = new JPanel();
+    rightPanel.setLayout(new java.awt.BorderLayout());
     rightPanel.setOpaque(false);
     rightPanel.setMinimumSize(new Dimension(rightPanelWidth, 0));
     rightPanel.setPreferredSize(new Dimension(rightPanelWidth, 592));
     rightPanel.setMaximumSize(new Dimension(rightPanelWidth, Integer.MAX_VALUE));
     //rightPanel.setBackground(Color.BLUE); // Color added for visibility during testing
+
+    // Add sprite display button - transparent, non-clickable, scales via paintIcon to preserve GIF animation
+    JButton spriteButton = new JButton() {
+        @Override
+        protected void paintComponent(Graphics g) {
+            // Do NOT call super.paintComponent(g) to avoid filling background
+            setOpaque(false);
+            ImageIcon currentSprite = (ImageIcon) getIcon();
+            if (currentSprite == null) return;
+
+            int imgWidth = currentSprite.getIconWidth();
+            int imgHeight = currentSprite.getIconHeight();
+            int panelWidth = getWidth();
+            int panelHeight = getHeight();
+            if (panelWidth <= 0 || panelHeight <= 0 || imgWidth <= 0 || imgHeight <= 0) return;
+
+            double scale = Math.min((double) panelWidth / imgWidth, (double) panelHeight / imgHeight) * 0.95;
+            int scaledWidth = (int) Math.max(1, Math.round(imgWidth * scale));
+            int scaledHeight = (int) Math.max(1, Math.round(imgHeight * scale));
+            int x = (panelWidth - scaledWidth) / 2;
+            int y = (panelHeight - scaledHeight) / 2;
+
+            Graphics2D g2d = (Graphics2D) g.create();
+            try {
+                g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                g2d.translate(x, y);
+                g2d.scale(scaledWidth / (double) imgWidth, scaledHeight / (double) imgHeight);
+                // Paint the icon using ImageIcon so GIF frames animate
+                currentSprite.paintIcon(this, g2d, 0, 0);
+            } finally {
+                g2d.dispose();
+            }
+        }
+    };
+    // Make the button visually passive and non-interactive
+    spriteButton.setOpaque(false);
+    spriteButton.setContentAreaFilled(false);
+    spriteButton.setBorderPainted(false);
+    spriteButton.setFocusPainted(false);
+    spriteButton.setFocusable(false);
+    spriteButton.setRolloverEnabled(false);
+    // Do not add any action listeners; clicks do nothing
+    rightPanel.add(spriteButton, java.awt.BorderLayout.CENTER);
+
+    // Update the button's icon whenever the sprite changes
+    Runnable updateSprite = () -> {
+        ImageIcon icon = spriteTransition.getCurrentImage();
+        if (icon != null) {
+            spriteButton.setIcon(icon);
+            spriteButton.repaint();
+        }
+    };
+    spriteTransition.setOnFrameChange(updateSprite);
+    javax.swing.SwingUtilities.invokeLater(updateSprite);
+
 
     gbc.gridy = 0;
     gbc.fill = GridBagConstraints.BOTH;
