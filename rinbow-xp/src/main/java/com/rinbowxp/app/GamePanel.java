@@ -14,6 +14,8 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.RenderingHints;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.net.URI;
@@ -23,6 +25,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
 
 
 public class GamePanel extends JPanel implements MouseListener{
@@ -155,7 +159,7 @@ public class GamePanel extends JPanel implements MouseListener{
     private void setLowerPanel() {
     lowerPanel = new JPanel();
     lowerPanel.setLayout(new GridBagLayout());
-
+        lowerPanel.setOpaque(false);
     lowerPanel.setBorder(BorderFactory.createEmptyBorder(
         0,
         (int)(frameDimension.getWidth() / 32),
@@ -163,19 +167,68 @@ public class GamePanel extends JPanel implements MouseListener{
         (int)(frameDimension.getWidth() / 32)
     ));
 
-    // Left Panel (60%)
+    // Left Panel (53%)
     JPanel leftPanel = new JPanel();
-    leftPanel.setOpaque(true);
-    leftPanel.setBackground(Color.RED); // Color added for visibility during testing
-    leftPanel.setLayout(new FlowLayout());
-    leftPanel.add(new Keyboard());
+    leftPanel.setOpaque(false);
+    leftPanel.setLayout(new GridBagLayout());
+    
+    JLabel clueLabel = new JLabel("Operating System");
+    clueLabel.setFont(boldCustomFont.deriveFont(24f));
+    clueLabel.setHorizontalAlignment(JLabel.CENTER);
+    clueLabel.setForeground(Color.lightGray);
+    clueLabel.setPreferredSize(new Dimension(320, 50));
+    clueLabel.setBackground(new Color(0, 87, 204));
+    clueLabel.setOpaque(true);
+    clueLabel.setBorder(BorderFactory.createCompoundBorder(
+        BorderFactory.createLineBorder(Color.black, 3),
+        BorderFactory.createEmptyBorder(10, 30, 10, 30)
+    ));
 
-    // Right Panel (40%)
-    JPanel rightPanel = new JPanel();
-    rightPanel.setOpaque(true);
-    rightPanel.setBackground(Color.BLUE); // Color added for visibility during testing
-
+    JTextArea textArea = new JTextArea(3, 20);
+    textArea.setFont(customFont);
+    textArea.setLineWrap(true);
+    textArea.setWrapStyleWord(true);
+    JScrollPane scrollPane = new JScrollPane(textArea);
+    scrollPane.setPreferredSize(new Dimension(100, 80));
+    // Create keyboard and connect text area
+    Keyboard keyboard = new Keyboard();
+    keyboard.setTextArea(textArea);
+    
+    // Wrap keyboard in a panel to center it
+    JPanel keyboardWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+    keyboardWrapper.setOpaque(false);
+    keyboardWrapper.add(keyboard);
+    
     GridBagConstraints gbc = new GridBagConstraints();
+    gbc.gridy = 0;
+    gbc.fill = GridBagConstraints.NONE;
+    leftPanel.add(clueLabel, gbc);
+    gbc.gridy = 1;
+    gbc.insets = new Insets((int)(frameDimension.getHeight() / 20), 0, 0, 0);
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    leftPanel.add(scrollPane, gbc);
+    gbc.gridy = 2;
+    gbc.insets = new Insets((int)(frameDimension.getHeight() / 20), 0, (int)(frameDimension.getHeight() / 15), 0);
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    leftPanel.add(keyboardWrapper, gbc);
+    
+    // Set width constraints for left and right panel.
+    int lowerPanelWidth = (int)(frameDimension.getWidth() - (frameDimension.getWidth() / 16));
+    int leftPanelWidth = (int)(lowerPanelWidth * 0.53);
+    int rightPanelWidth = (int)(lowerPanelWidth * 0.47);
+    
+    
+    leftPanel.setMinimumSize(new Dimension(leftPanelWidth, 0));
+    leftPanel.setPreferredSize(new Dimension(leftPanelWidth, 592));
+    leftPanel.setMaximumSize(new Dimension(leftPanelWidth, Integer.MAX_VALUE));
+
+    JPanel rightPanel = new JPanel();
+    rightPanel.setOpaque(false);
+    rightPanel.setMinimumSize(new Dimension(rightPanelWidth, 0));
+    rightPanel.setPreferredSize(new Dimension(rightPanelWidth, 592));
+    rightPanel.setMaximumSize(new Dimension(rightPanelWidth, Integer.MAX_VALUE));
+    //rightPanel.setBackground(Color.BLUE); // Color added for visibility during testing
+
     gbc.gridy = 0;
     gbc.fill = GridBagConstraints.BOTH;
     gbc.weighty = 1.0;
@@ -187,6 +240,18 @@ public class GamePanel extends JPanel implements MouseListener{
     gbc.gridx = 1;
     gbc.weightx = 0.47;
     lowerPanel.add(rightPanel, gbc);
+    
+    // // Add component listener to print dimensions after layout
+    // final JPanel finalLeftPanel = leftPanel;
+    // final JPanel finalRightPanel = rightPanel;
+    // lowerPanel.addComponentListener(new ComponentAdapter() {
+    //     @Override
+    //     public void componentResized(ComponentEvent e) {
+    //         System.out.println("Dimensions Left Panel: " + finalLeftPanel.getSize());
+    //         System.out.println("Dimensions Right Panel: " + finalRightPanel.getSize());
+    //         System.out.println("Dimensions Lower Panel: " + lowerPanel.getSize());
+    //     }
+    // });
 
 }
 
