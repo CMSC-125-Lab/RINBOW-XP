@@ -70,7 +70,7 @@ public class ResourceManager {
         System.out.println("Loading image icons...");
         imageIconHashMap.put(
             "Contact Panel BG",
-            new ImageIcon(getURLFromFiles("contact-bg.png"))
+            new ImageIcon(getURLFromFiles("contact-bg1.png"))
         );
 
         imageIconHashMap.put(
