@@ -10,10 +10,10 @@ public class GameSessionTest {
         System.out.println("=== HANGMAN GAME ===");
         System.out.println("Guess the word letter by letter!");
         System.out.println("You have " + game.getMaxWrongAttempts() + " wrong attempts allowed.");
-        System.out.println();
+        System.out.println(game.getStatus());
         
         // Game loop
-        while (game.getStatus().equals("RUNNING")) {
+        while (game.getStatus().toString().equals("RUNNING")) {
             System.out.println("Word: " + game.getDisplayWord());
             System.out.println("Wrong attempts: " + game.getWrongCount() + "/" + game.getMaxWrongAttempts());
             System.out.println("Guessed letters: " + game.getGuessed());
@@ -47,16 +47,14 @@ public class GameSessionTest {
             System.out.println();
         }
         
-        // Game over
-        System.out.println("=== GAME OVER ===");
-        System.out.println("Word: " + game.getDisplayWord());
-        System.out.println("Secret word was: " + game.getSecretWord());
-        
-        if (game.getStatus().equals("WON")) {
+        // Ending
+        if (game.getStatus().toString().equals("WON")) {
             System.out.println("🎉 Congratulations! You WON!");
         } else {
             System.out.println("💀 Game Over! You LOST!");
         }
+
+        IO.println(game.getSecretWord());
         
         System.out.println("Wrong attempts: " + game.getWrongCount() + "/" + game.getMaxWrongAttempts());
         
