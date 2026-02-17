@@ -29,6 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 
+import com.rinbowxp.app.game_logic.GameSession;
 
 public class GamePanel extends JPanel implements MouseListener{
     private JPanel cardPanel;
@@ -45,6 +46,8 @@ public class GamePanel extends JPanel implements MouseListener{
 
     private ResourceManager resourceManager;
     private SpriteTransition spriteTransition;
+    private GameSession gameSession;
+    private JLabel wordDisplayLabel;
 
     public GamePanel(CardLayout cardLayout, JPanel cardPanel, ResourceManager resourceManager,
                             Dimension frameDimension){
@@ -57,6 +60,9 @@ public class GamePanel extends JPanel implements MouseListener{
         
         // Initialize sprite transition
         spriteTransition = new SpriteTransition(resourceManager);
+        
+        // Initialize game session
+        gameSession = new GameSession();
 
         // PNG transition speed
         spriteTransition.setTransitionSpeed(20);
@@ -180,7 +186,7 @@ public class GamePanel extends JPanel implements MouseListener{
     leftPanel.setOpaque(false);
     leftPanel.setLayout(new GridBagLayout());
     
-    JLabel clueLabel = new JLabel("Operating System");
+    JLabel clueLabel = new JLabel(gameSession.getDifficulty());
     clueLabel.setFont(boldCustomFont.deriveFont(24f));
     clueLabel.setHorizontalAlignment(JLabel.CENTER);
     clueLabel.setForeground(Color.lightGray);
@@ -192,15 +198,17 @@ public class GamePanel extends JPanel implements MouseListener{
         BorderFactory.createEmptyBorder(10, 30, 10, 30)
     ));
 
-    JTextArea textArea = new JTextArea(3, 20);
-    textArea.setFont(customFont);
-    textArea.setLineWrap(true);
-    textArea.setWrapStyleWord(true);
-    JScrollPane scrollPane = new JScrollPane(textArea);
-    scrollPane.setPreferredSize(new Dimension(100, 80));
-    // Create keyboard and connect text area
+    // Create word display label showing blanks for each letter
+    wordDisplayLabel = new JLabel(gameSession.getDisplayWord());
+    wordDisplayLabel.setFont(customFont.deriveFont(32f));
+    wordDisplayLabel.setHorizontalAlignment(JLabel.CENTER);
+    wordDisplayLabel.setForeground(Color.BLACK);
+    wordDisplayLabel.setOpaque(false);
+    
+    // Create keyboard and connect game session
     Keyboard keyboard = new Keyboard();
-    keyboard.setTextArea(textArea);
+    keyboard.setGameSession(gameSession);
+    keyboard.setWordDisplayLabel(wordDisplayLabel);
     
     // Wrap keyboard in a panel to center it
     JPanel keyboardWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
@@ -213,8 +221,8 @@ public class GamePanel extends JPanel implements MouseListener{
     leftPanel.add(clueLabel, gbc);
     gbc.gridy = 1;
     gbc.insets = new Insets((int)(frameDimension.getHeight() / 20), 0, 0, 0);
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    leftPanel.add(scrollPane, gbc);
+    gbc.fill = GridBagConstraints.NONE;
+    leftPanel.add(wordDisplayLabel, gbc);
     gbc.gridy = 2;
     gbc.insets = new Insets((int)(frameDimension.getHeight() / 20), 0, (int)(frameDimension.getHeight() / 15), 0);
     gbc.fill = GridBagConstraints.HORIZONTAL;

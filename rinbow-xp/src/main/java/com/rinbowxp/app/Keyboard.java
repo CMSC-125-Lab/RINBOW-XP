@@ -14,14 +14,17 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.JLabel;
+
+import com.rinbowxp.app.game_logic.GameSession;
 
 public class Keyboard extends JPanel{
     // Source - https://stackoverflow.com/a/13613236
     // Posted by FThompson, modified by community. See post 'Timeline' for change history
     // Retrieved 2026-02-10, License - CC BY-SA 3.0
     private ResourceManager resourceManager = new ResourceManager();
-    private JTextArea textArea;
+    private JLabel wordDisplayLabel;
+    private GameSession gameSession;
 
     String row1 = "QWERTYUIOP";
     String row2 = "ASDFGHJKL";
@@ -122,10 +125,16 @@ public class Keyboard extends JPanel{
         button.setOpaque(false);
         button.setRolloverEnabled(true);
         
-        // Add action to type character into text area
+        // Add action to update word display when letter is clicked
         button.addActionListener(e -> {
-            if (textArea != null) {
-                textArea.append(String.valueOf(keyChar));
+            // Check if letter is in the word using GameSession
+            if (gameSession != null) {
+                gameSession.makeGuess(String.valueOf(keyChar));
+                
+                // Update the word display label
+                if (wordDisplayLabel != null) {
+                    wordDisplayLabel.setText(gameSession.getDisplayWord());
+                }
             }
         });
         
@@ -147,8 +156,12 @@ public class Keyboard extends JPanel{
         return button;
     }
 
-    public void setTextArea(JTextArea textArea) {
-        this.textArea = textArea;
+    public void setWordDisplayLabel(JLabel wordDisplayLabel) {
+        this.wordDisplayLabel = wordDisplayLabel;
+    }
+
+    public void setGameSession(GameSession gameSession) {
+        this.gameSession = gameSession;
     }
 
 }

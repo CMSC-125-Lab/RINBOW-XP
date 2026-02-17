@@ -43,6 +43,14 @@ public class GameSession {
     public boolean makeGuess(String letter) {
         letter = letter.toUpperCase();
         
+        System.out.println(letter + " is clicked");
+        
+        // Check if game is already over
+        if (status != GameStatus.RUNNING) {
+            System.out.println("Game is already over. Cannot make more guesses.");
+            return false;
+        }
+        
         if (!rules.validateGuess(letter, guessed)) {
             return false;  // Invalid or already guessed
         }
@@ -50,11 +58,13 @@ public class GameSession {
         guessed.add(letter);
         
         if (secretWord.contains(letter)) {
+            System.out.println(letter + " is CORRECT! It's in the word.");
             updateStatus();
             return true;
         } else {
             wrongCount++;
             damageLevel++;
+            System.out.println(letter + " is WRONG! Not in the word. (" + wrongCount + "/" + rules.getMaxWrongAttempts() + " wrong attempts)");
             updateStatus();
             return false;
         }
@@ -79,10 +89,30 @@ public class GameSession {
     private void updateStatus() {
         if (isWordComplete()) {
             status = GameStatus.WON;
+            announceResult();
         } else if (wrongCount >= rules.getMaxWrongAttempts()) {
             status = GameStatus.LOST;
+            announceResult();
         } else {
             status = GameStatus.RUNNING;
+        }
+    }
+    
+    /**
+     * Announces the game result in the terminal
+     */
+    private void announceResult() {
+        if (status == GameStatus.WON) {
+            System.out.println("\n=================================");
+            System.out.println("🎉 CONGRATULATIONS! YOU WON! 🎉");
+            System.out.println("The word was: " + secretWord);
+            System.out.println("=================================\n");
+        } else if (status == GameStatus.LOST) {
+            System.out.println("\n=================================");
+            System.out.println("💀 GAME OVER! YOU LOST! 💀");
+            System.out.println("The word was: " + secretWord);
+            System.out.println("Wrong attempts: " + wrongCount + "/" + rules.getMaxWrongAttempts());
+            System.out.println("=================================\n");
         }
     }
     
@@ -129,6 +159,14 @@ public class GameSession {
     
     public GameRules getRules() {
         return rules;
+    }
+    
+    public String getClue() {
+        return word.clue();
+    }
+    
+    public String getDifficulty() {
+        return word.difficulty().toString();
     }
     
     /**
