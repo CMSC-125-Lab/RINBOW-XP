@@ -29,11 +29,13 @@ public class MainFrame extends JFrame{
         RulesPage rulesPage = new RulesPage(cardLayout, cardPanel, resourceManager, new Dimension(frameWidth, frameHeight));
         GameResultPage gameResultPage = new GameResultPage(cardLayout, cardPanel, resourceManager, new Dimension(frameWidth, frameHeight));
         GamePanel gamePanel = new GamePanel(cardLayout, cardPanel, gameResultPage, resourceManager, new Dimension(frameWidth, frameHeight));
+        ChooseDifficultyPage chooseDifficultyPage = new ChooseDifficultyPage(cardLayout, cardPanel, gamePanel, resourceManager, new Dimension(frameWidth, frameHeight));   
         cardPanel.add(homePagePanel, "Home Page");
         cardPanel.add(contactPagePanel, "Contact Page");
         cardPanel.add(rulesPage, "Rules Page");
         cardPanel.add(gamePanel, "Game Panel");
         cardPanel.add(gameResultPage, "Game Result Page");
+        cardPanel.add(chooseDifficultyPage, "Choose Difficulty Page");
         return cardPanel;
     }
 

@@ -140,6 +140,25 @@ public class GameSession {
         this.damageLevel = 0;
         this.currentRound++;
     }
+
+    public void startNewGame(String difficulty) {
+        if (difficulty.equalsIgnoreCase("EASY")) {
+            this.word = provider.nextWord(Optional.of(Difficulty.EASY));
+        } else if (difficulty.equalsIgnoreCase("MEDIUM")) {
+            this.word = provider.nextWord(Optional.of(Difficulty.MEDIUM));
+        } else if (difficulty.equalsIgnoreCase("HARD")) {
+            this.word = provider.nextWord(Optional.of(Difficulty.HARD));
+        } else {
+            this.word = provider.nextWord(Optional.empty());  // Get next word with any difficulty
+        }
+        this.secretWord = word.term();
+        this.guessed = new HashSet<>();
+        this.wrongCount = 0;
+        this.status = GameStatus.RUNNING;
+        this.damageLevel = 0;
+        this.rules = new GameRules(8);
+        this.currentRound = 1;
+    }
     
     // Getters for UI to read state
     public String getSecretWord() {

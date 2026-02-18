@@ -32,7 +32,7 @@ public class GamePanel extends JPanel implements MouseListener{
     private CardLayout cardLayout;
     private Image bg_image;
     private JPanel upperPanel, lowerPanel;
-    private JLabel title, homePageButton, exitButtonLabel, minimizeButtonLabel, gamedescriptionButton;
+    private JLabel title, homePageButton, exitButtonLabel, minimizeButtonLabel, gamedescriptionButton, clueLabel;
     private Font customFont = new Font("Arial", Font.PLAIN, 21);
     private Font boldCustomFont = new Font("Arial", Font.BOLD, 21);
     private Font titleFont = new Font("Arial", Font.BOLD, 56);
@@ -182,7 +182,7 @@ public class GamePanel extends JPanel implements MouseListener{
     leftPanel.setOpaque(false);
     leftPanel.setLayout(new GridBagLayout());
     
-    JLabel clueLabel = new JLabel(gameSession.getDifficulty());
+    clueLabel = new JLabel(gameSession.getDifficulty());
     clueLabel.setFont(boldCustomFont.deriveFont(24f));
     clueLabel.setHorizontalAlignment(JLabel.CENTER);
     clueLabel.setForeground(Color.lightGray);
@@ -323,6 +323,12 @@ public class GamePanel extends JPanel implements MouseListener{
     // });
 
 }
+
+    public void createNewGame(String difficulty) {
+        gameSession.startNewGame(difficulty);
+        wordDisplayLabel.setText(gameSession.getDisplayWord());
+        clueLabel.setText(gameSession.getDifficulty());
+    }
 
     @Override
     protected void paintComponent(Graphics g) {

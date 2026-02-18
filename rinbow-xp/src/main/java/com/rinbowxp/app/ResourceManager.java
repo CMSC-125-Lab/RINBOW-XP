@@ -122,6 +122,14 @@ public class ResourceManager {
             "Keyboard",
             new ImageIcon(getURLFromFiles("keyboard2.png"))
         );
+        imageIconHashMap.put(
+            "Difficulty Options BG",
+            new ImageIcon(getURLFromFiles("difficultyOptionLabel.png"))
+        );
+        imageIconHashMap.put(
+            "Difficulty Options BG Clicked",
+            new ImageIcon(getURLFromFiles("difficultyOptionLabel_clicked.png"))
+        );
         
         System.out.println("Image Icons loaded successfully!");
     }
