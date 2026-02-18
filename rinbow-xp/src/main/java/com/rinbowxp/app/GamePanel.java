@@ -14,8 +14,6 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.RenderingHints;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.net.URI;
@@ -26,8 +24,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JScrollPane;
 
 import com.rinbowxp.app.game_logic.GameSession;
 
@@ -49,7 +45,7 @@ public class GamePanel extends JPanel implements MouseListener{
     private GameSession gameSession;
     private JLabel wordDisplayLabel;
 
-    public GamePanel(CardLayout cardLayout, JPanel cardPanel, ResourceManager resourceManager,
+    public GamePanel(CardLayout cardLayout, JPanel cardPanel, GameResultPage gameResultPage, ResourceManager resourceManager,
                             Dimension frameDimension){
         this.cardLayout = cardLayout;
         this.cardPanel = cardPanel;
@@ -62,7 +58,7 @@ public class GamePanel extends JPanel implements MouseListener{
         spriteTransition = new SpriteTransition(resourceManager);
         
         // Initialize game session
-        gameSession = new GameSession();
+        gameSession = new GameSession(cardLayout, cardPanel, gameResultPage);
 
         // PNG transition speed
         spriteTransition.setTransitionSpeed(20);

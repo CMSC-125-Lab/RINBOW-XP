@@ -1,12 +1,14 @@
 package com.rinbowxp.app.game_logic;
 
+import java.awt.CardLayout;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import com.rinbowxp.app.word.*;
 
-import com.rinbowxp.app.word.CsvWordProvider;
-import com.rinbowxp.app.word.WordProvider;
+import javax.swing.JPanel;
+
+import com.rinbowxp.app.GameResultPage;
+import com.rinbowxp.app.word.*;
 
 public class GameSession {
     // Temporary placeholders - will be replaced with actual classes later
@@ -20,10 +22,14 @@ public class GameSession {
     private GameRules rules;
     private int currentRound;  // TODO: Replace with GameRound
     
+    private CardLayout cardLayout;  // For UI navigation
+    private JPanel cardPanel;        // For UI navigation
+    private GameResultPage gameResultPage;  // To show results after game ends
+
     /**
      * Constructor initializes a new game session
      */
-    public GameSession() {
+    public GameSession(CardLayout cardLayout, JPanel cardPanel, GameResultPage gameResultPage) {
         this.provider = new CsvWordProvider("../resources/word-dict/terms.csv");
         this.word = provider.nextWord(Optional.of(Difficulty.EASY));
         this.secretWord = word.term();
@@ -33,8 +39,10 @@ public class GameSession {
         this.damageLevel = 0;
         this.rules = new GameRules(8);
         this.currentRound = 1;
+        this.cardLayout = cardLayout;
+        this.cardPanel = cardPanel;
+        this.gameResultPage = gameResultPage;
     }
-    
     /**
      * Makes a guess and updates game state
      * @param letter The letter guessed by the player
@@ -107,13 +115,18 @@ public class GameSession {
             System.out.println("🎉 CONGRATULATIONS! YOU WON! 🎉");
             System.out.println("The word was: " + secretWord);
             System.out.println("=================================\n");
+            gameResultPage.setGameResult(true, secretWord, wrongCount, rules.getMaxWrongAttempts());
+            cardLayout.show(cardPanel, "Game Result Page");
         } else if (status == GameStatus.LOST) {
             System.out.println("\n=================================");
             System.out.println("💀 GAME OVER! YOU LOST! 💀");
             System.out.println("The word was: " + secretWord);
             System.out.println("Wrong attempts: " + wrongCount + "/" + rules.getMaxWrongAttempts());
             System.out.println("=================================\n");
+            gameResultPage.setGameResult(false, secretWord, wrongCount, rules.getMaxWrongAttempts());
+            cardLayout.show(cardPanel, "Game Result Page");
         }
+        resetRound();// Reset status for next game
     }
     
     /**

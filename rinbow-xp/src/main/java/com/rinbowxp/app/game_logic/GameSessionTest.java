@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class GameSessionTest {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        GameSession game = new GameSession();
+        GameSession game = new GameSession(null, null, null);
         
         System.out.println("=== HANGMAN GAME ===");
         System.out.println("Guess the word letter by letter!");
