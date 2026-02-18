@@ -7,10 +7,17 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 
@@ -23,6 +30,7 @@ public class Keyboard extends JPanel{
     private ResourceManager resourceManager = new ResourceManager();
     private JLabel wordDisplayLabel;
     private GameSession gameSession;
+    private final Map<Character, JButton> keyButtons = new HashMap<>();
 
     String row1 = "QWERTYUIOP";
     String row2 = "ASDFGHJKL";
@@ -82,6 +90,30 @@ public class Keyboard extends JPanel{
         keyboardPanel.add(row3Panel, gbc);
 
         add(keyboardPanel);
+        setupKeyboardBindings();
+    }
+
+    private void setupKeyboardBindings() {
+        javax.swing.InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = getActionMap();
+
+        for (char c = 'A'; c <= 'Z'; c++) {
+            final char letter = c;
+            String actionKey = "guess_" + letter;
+
+            inputMap.put(KeyStroke.getKeyStroke(Character.toLowerCase(letter)), actionKey);
+            inputMap.put(KeyStroke.getKeyStroke(letter), actionKey);
+
+            actionMap.put(actionKey, new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JButton button = keyButtons.get(letter);
+                    if (button != null && button.isEnabled()) {
+                        button.doClick();
+                    }
+                }
+            });
+        }
     }
 
     private JButton createKeyButton(char keyChar) {
@@ -122,6 +154,7 @@ public class Keyboard extends JPanel{
         button.setOpaque(false);
         button.setRolloverEnabled(true);
         button.putClientProperty("pressed", false);
+        keyButtons.put(Character.toUpperCase(keyChar), button);
         
         // Add action to update word display when letter is clicked
         button.addActionListener(e -> {
@@ -139,7 +172,7 @@ public class Keyboard extends JPanel{
                 button.repaint();
             }
         });
-        
+        button.setFocusable(false);
         return button;
     }
 
