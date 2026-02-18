@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.swing.JPanel;
 
 import com.rinbowxp.app.GameResultPage;
+import com.rinbowxp.app.SpriteTransition;
 import com.rinbowxp.app.word.*;
 
 public class GameSession {
@@ -25,11 +26,11 @@ public class GameSession {
     private CardLayout cardLayout;  // For UI navigation
     private JPanel cardPanel;        // For UI navigation
     private GameResultPage gameResultPage;  // To show results after game ends
-
+    private SpriteTransition spriteTransition;  
     /**
      * Constructor initializes a new game session
      */
-    public GameSession(CardLayout cardLayout, JPanel cardPanel, GameResultPage gameResultPage) {
+    public GameSession(CardLayout cardLayout, JPanel cardPanel, GameResultPage gameResultPage, SpriteTransition spriteTransition) {
         this.provider = new CsvWordProvider("../resources/word-dict/terms.csv");
         this.word = provider.nextWord(Optional.of(Difficulty.EASY));
         this.secretWord = word.term();
@@ -42,6 +43,7 @@ public class GameSession {
         this.cardLayout = cardLayout;
         this.cardPanel = cardPanel;
         this.gameResultPage = gameResultPage;
+        this.spriteTransition = spriteTransition;
     }
     /**
      * Makes a guess and updates game state
@@ -72,6 +74,7 @@ public class GameSession {
         } else {
             wrongCount++;
             damageLevel++;
+            spriteTransition.next();
             System.out.println(letter + " is WRONG! Not in the word. (" + wrongCount + "/" + rules.getMaxWrongAttempts() + " wrong attempts)");
             updateStatus();
             return false;

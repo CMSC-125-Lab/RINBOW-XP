@@ -43,6 +43,7 @@ public class GamePanel extends JPanel implements MouseListener{
 
     private ResourceManager resourceManager;
     private SpriteTransition spriteTransition;
+    private JButton spriteButton;
     private GameSession gameSession;
     private JLabel wordDisplayLabel;
 
@@ -59,7 +60,7 @@ public class GamePanel extends JPanel implements MouseListener{
         spriteTransition = new SpriteTransition(resourceManager);
         
         // Initialize game session
-        gameSession = new GameSession(cardLayout, cardPanel, gameResultPage);
+        gameSession = new GameSession(cardLayout, cardPanel, gameResultPage, spriteTransition);
 
         // PNG transition speed
         spriteTransition.setTransitionSpeed(20);
@@ -288,7 +289,7 @@ public class GamePanel extends JPanel implements MouseListener{
     //rightPanel.setBackground(Color.BLUE); // Color added for visibility during testing
 
     // Add sprite display button - transparent, non-clickable, scales via paintIcon to preserve GIF animation
-    JButton spriteButton = new JButton() {
+    spriteButton = new JButton() {
         @Override
         protected void paintComponent(Graphics g) {
             // Do NOT call super.paintComponent(g) to avoid filling background
@@ -373,6 +374,8 @@ public class GamePanel extends JPanel implements MouseListener{
         gameSession.startNewGame(difficulty);
         wordDisplayLabel.setText(gameSession.getDisplayWord());
         clueLabel.setText(gameSession.getDifficulty());
+        spriteTransition.reset();
+        spriteButton.setIcon(spriteTransition.getCurrentImage());
         keyboard.reset();
         keyboard.setGameSession(gameSession);
         keyboard.setWordDisplayLabel(wordDisplayLabel);
