@@ -29,7 +29,7 @@ public class ContactPagePanel extends JPanel implements MouseListener{
     private CardLayout cardLayout;
     private Image bg_image;
     private JPanel upperPanel, lowerPanel;
-    private JLabel title, homePageButton, contentPageButton, contactPageButton, exitButtonLabel, minimizeButtonLabel;
+    private JLabel title, homePageButton, contentPageButton, contactPageButton, settingsButton, exitButtonLabel, minimizeButtonLabel;
     private Font customFont = new Font("Arial", Font.PLAIN, 21);
     private Font boldCustomFont = new Font("Arial", Font.BOLD, 21);
     private Font titleFont = new Font("Arial", Font.BOLD, 56);
@@ -94,6 +94,11 @@ public class ContactPagePanel extends JPanel implements MouseListener{
         contactPageButton.setFont(boldCustomFont);
         contactPageButton.addMouseListener(this);
 
+        settingsButton = new JLabel("Settings");
+        settingsButton.setForeground(java.awt.Color.black);
+        settingsButton.setFont(customFont);
+        settingsButton.addMouseListener(this);
+
         exitButton = resourceManager.getImageIcon("Exit Button");
         Image exitButtonResized = exitButton.getImage().getScaledInstance((int) frameDimension.getWidth()/25, (int) frameDimension.getWidth()/25, Image.SCALE_DEFAULT);
         exitButton = new ImageIcon(exitButtonResized);
@@ -122,6 +127,7 @@ public class ContactPagePanel extends JPanel implements MouseListener{
         navPanel.add(homePageButton);       // Home
         navPanel.add(contentPageButton);      // Rules
         navPanel.add(contactPageButton);     // Contact
+        navPanel.add(settingsButton);        // Settings
 
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.NONE;
@@ -318,9 +324,12 @@ public class ContactPagePanel extends JPanel implements MouseListener{
         else if (e.getSource() == contactPageButton) {
             cardLayout.show(cardPanel, "Contact Page");
         }
-        else if (e.getSource() == github1){
+        else if (e.getSource() == settingsButton) {
+            cardLayout.show(cardPanel, "Settings Page");
+        }
+         else if (e.getSource() == email1) {
             Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
-            if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+            if (desktop != null && desktop.isSupported(Desktop.Action.MAIL)) {
                 try {
                     desktop.browse(new URI("https://github.com/rolpppp"));
                 }
@@ -403,6 +412,8 @@ public class ContactPagePanel extends JPanel implements MouseListener{
 
         }else if (e.getSource() == exitButtonLabel) {
             exitButtonLabel.setIcon(exitButtonClicked);
+        } else if (e.getSource() == settingsButton) {
+            settingsButton.setFont(boldCustomFont);
         }
         else if (e.getSource() == minimizeButtonLabel) {
             minimizeButtonLabel.setIcon(minimizeButtonClicked);
@@ -424,6 +435,8 @@ public class ContactPagePanel extends JPanel implements MouseListener{
         else if (e.getSource() == homePageButton){
             homePageButton.setFont(customFont);
 
+        } else if (e.getSource() == settingsButton) {
+            settingsButton.setFont(customFont);
         }
         else if (e.getSource() == exitButtonLabel) {
             exitButtonLabel.setIcon(exitButton);
