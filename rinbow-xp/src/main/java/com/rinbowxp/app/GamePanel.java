@@ -7,6 +7,7 @@ import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
@@ -37,7 +38,7 @@ public class GamePanel extends JPanel implements MouseListener{
     private Font boldCustomFont = new Font("Arial", Font.BOLD, 21);
     private Font titleFont = new Font("Arial", Font.BOLD, 56);
     private ImageIcon exitButton, exitButtonClicked, minimizeButton, minimizeButtonClicked;
-
+    private Keyboard keyboard;
     private Dimension frameDimension;
 
     private ResourceManager resourceManager;
@@ -194,15 +195,59 @@ public class GamePanel extends JPanel implements MouseListener{
         BorderFactory.createEmptyBorder(10, 30, 10, 30)
     ));
 
-    // Create word display label showing blanks for each letter
-    wordDisplayLabel = new JLabel(gameSession.getDisplayWord());
+    // Create word display label showing blanks for each letter (AI VIBE CODERS)
+    wordDisplayLabel = new JLabel(gameSession.getDisplayWord()) {
+        private static final float MAX_FONT_SIZE = 32f;
+        private static final float MIN_FONT_SIZE = 16f;
+
+        private void resizeFontToFitText() {
+            Font baseFont = customFont != null ? customFont : getFont();
+            int availableWidth = getWidth() - 12;
+            if (availableWidth <= 0) {
+                availableWidth = (int) (frameDimension.getWidth() * 0.42);
+            }
+
+            String text = getText();
+            if (text == null || text.isEmpty()) {
+                setFont(baseFont.deriveFont(MAX_FONT_SIZE));
+                return;
+            }
+
+            float currentSize = MAX_FONT_SIZE;
+            Font fittedFont = baseFont.deriveFont(currentSize);
+            FontMetrics metrics = getFontMetrics(fittedFont);
+
+            while (currentSize > MIN_FONT_SIZE && metrics.stringWidth(text) > availableWidth) {
+                currentSize -= 1f;
+                fittedFont = baseFont.deriveFont(currentSize);
+                metrics = getFontMetrics(fittedFont);
+            }
+
+            if (!fittedFont.equals(getFont())) {
+                setFont(fittedFont);
+            }
+        }
+
+        @Override
+        public void setText(String text) {
+            super.setText(text);
+            resizeFontToFitText();
+        }
+
+        @Override
+        public void doLayout() {
+            super.doLayout();
+            resizeFontToFitText();
+        }
+    };
     wordDisplayLabel.setFont(customFont.deriveFont(32f));
     wordDisplayLabel.setHorizontalAlignment(JLabel.CENTER);
     wordDisplayLabel.setForeground(Color.BLACK);
     wordDisplayLabel.setOpaque(false);
+    wordDisplayLabel.setPreferredSize(new Dimension((int) (frameDimension.getWidth() * 0.42), 56));
     
     // Create keyboard and connect game session
-    Keyboard keyboard = new Keyboard();
+    keyboard = new Keyboard();
     keyboard.setGameSession(gameSession);
     keyboard.setWordDisplayLabel(wordDisplayLabel);
     
@@ -328,6 +373,11 @@ public class GamePanel extends JPanel implements MouseListener{
         gameSession.startNewGame(difficulty);
         wordDisplayLabel.setText(gameSession.getDisplayWord());
         clueLabel.setText(gameSession.getDifficulty());
+        keyboard.reset();
+        keyboard.setGameSession(gameSession);
+        keyboard.setWordDisplayLabel(wordDisplayLabel);
+        lowerPanel.revalidate();
+        lowerPanel.repaint();
     }
 
     @Override

@@ -7,8 +7,6 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -95,8 +93,6 @@ public class Keyboard extends JPanel{
         ImageIcon clickedImage = new ImageIcon(resourceManager.getURLFromFiles(clickedImagePath));
         
         JButton button = new JButton() {
-            private boolean isPressed = false;
-            
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g.create();
@@ -105,7 +101,8 @@ public class Keyboard extends JPanel{
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 
                 // Draw the appropriate image based on button state
-                ImageIcon currentImage = isPressed || getModel().isArmed() ? clickedImage : idleImage;
+                boolean isLockedPressed = Boolean.TRUE.equals(getClientProperty("pressed"));
+                ImageIcon currentImage = isLockedPressed || getModel().isArmed() ? clickedImage : idleImage;
                 g2d.drawImage(currentImage.getImage(), 0, 0, getWidth(), getHeight(), this);
                 g2d.dispose();
                 
@@ -124,6 +121,7 @@ public class Keyboard extends JPanel{
         button.setFocusPainted(false);
         button.setOpaque(false);
         button.setRolloverEnabled(true);
+        button.putClientProperty("pressed", false);
         
         // Add action to update word display when letter is clicked
         button.addActionListener(e -> {
@@ -135,25 +133,34 @@ public class Keyboard extends JPanel{
                 if (wordDisplayLabel != null) {
                     wordDisplayLabel.setText(gameSession.getDisplayWord());
                 }
-            }
-        });
-        
-        // Track button press state
-        button.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                ((JButton) e.getSource()).putClientProperty("pressed", true);
-                ((Component) e.getSource()).repaint();
-            }
-            
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                ((JButton) e.getSource()).putClientProperty("pressed", false);
-                ((Component) e.getSource()).repaint();
+                button.setEnabled(false); // Disable button after it's clicked
+                button.putClientProperty("pressed", true);
+                
+                button.repaint();
             }
         });
         
         return button;
+    }
+
+    public void reset() {
+        resetButtons(this);
+    }
+
+    private void resetButtons(Component component) {
+        if (component instanceof JButton) {
+            JButton button = (JButton) component;
+            button.setEnabled(true);
+            button.putClientProperty("pressed", false);
+            button.repaint();
+            return;
+        }
+
+        if (component instanceof JPanel) {
+            for (Component child : ((JPanel) component).getComponents()) {
+                resetButtons(child);
+            }
+        }
     }
 
     public void setWordDisplayLabel(JLabel wordDisplayLabel) {
