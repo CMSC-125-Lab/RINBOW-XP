@@ -165,12 +165,62 @@ public class RulesPage extends JPanel implements MouseListener{
         lowerPanel.setOpaque(false);
         lowerPanel.setLayout(new GridBagLayout());
 
-        JLabel title = new JLabel("RULES");
+        JLabel title = new JLabel("HOW TO PLAY");
         title.setForeground(new Color(0x0057cc));
-        title.setFont(titleFont);
-        lowerPanel.add(title);
-        
+        title.setFont(titleFont.deriveFont(64f));
 
+        JLabel line1 = new JLabel("Select Your Input: ");
+        line1.setFont(customFont.deriveFont(Font.BOLD,16f));
+        line1.setForeground(Color.BLACK);
+        JLabel line2 = new JLabel("Type the letter using your physical keyboard, or click the letters on the on-screen keyboard.");
+        line2.setFont(customFont.deriveFont(16f));
+        line2.setForeground(Color.BLACK);
+
+        JLabel line3 = new JLabel("Win Condition:");
+        line3.setFont(customFont.deriveFont(Font.BOLD,16f));
+        line3.setForeground(Color.BLACK);
+        JLabel line4 = new JLabel("Correctly guess in all the blank slots before the system collapses to win the Round.");
+        line4.setFont(customFont.deriveFont(16f));
+        line4.setForeground(Color.BLACK);
+
+        JLabel line5 = new JLabel("Lose Condition:");
+        line5.setFont(customFont.deriveFont(Font.BOLD,16f));
+        line5.setForeground(Color.BLACK);
+        JLabel line6 = new JLabel("Every incorrect guess triggers a hardware failure.");
+        line6.setFont(customFont.deriveFont(16f));
+        line6.setForeground(Color.BLACK);
+        JLabel line7 = new JLabel("You have exactly 8 attempts before the system collapses and you lose the Round.");
+        line7.setFont(customFont.deriveFont(16f));
+        line7.setForeground(Color.BLACK);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(0, 0, (int) frameDimension.getHeight() / 20, 0);
+        lowerPanel.add(title, gbc);
+
+        gbc.gridy = 1;
+        gbc.insets = new Insets(0, 0, (int) frameDimension.getHeight() / 40, 0);
+        lowerPanel.add(line1, gbc);
+        gbc.gridy = 2;
+        lowerPanel.add(line2, gbc);
+
+        gbc.gridy = 3;
+        gbc.insets = new Insets((int) frameDimension.getHeight() / 40, 0, (int) frameDimension.getHeight() / 40, 0);
+        lowerPanel.add(line3, gbc);
+        gbc.gridy = 4;
+        gbc.insets = new Insets(0, 0, (int) frameDimension.getHeight() / 40, 0);
+        lowerPanel.add(line4, gbc);
+
+        gbc.gridy = 5;
+        gbc.insets = new Insets((int) frameDimension.getHeight() / 40, 0, (int) frameDimension.getHeight() / 40, 0);
+        lowerPanel.add(line5, gbc);
+        gbc.gridy = 6;
+        gbc.insets = new Insets(0, 0, (int) frameDimension.getHeight() / 40, 0);
+        lowerPanel.add(line6, gbc);
+        gbc.gridy = 7;
+        gbc.insets = new Insets(0, 0, (int) frameDimension.getHeight() / 5, 0);
+        lowerPanel.add(line7, gbc);
     }
 
     @Override

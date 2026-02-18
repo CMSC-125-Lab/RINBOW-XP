@@ -226,7 +226,7 @@ public class ContactPagePanel extends JPanel implements MouseListener{
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.SOUTH;
         gbc.gridy = 1;
-        gbc.ipady = 3;
+        gbc.ipady = 15;
 
         gbc.insets = new Insets((int) (frameDimension.getHeight()/49), (int) (frameDimension.getWidth()/55), 0, (int) (frameDimension.getWidth()/55));
         lowerPanel.add(name1, gbc);
