@@ -176,14 +176,17 @@ public class MainPagePanel extends JPanel implements MouseListener{
         lowerPanel.setOpaque(false);
         lowerPanel.setLayout(new GridBagLayout());
 
-        JLabel title = new JLabel("CODE & CONQUEST");
+        JLabel title = new JLabel("TYPE OR DIE");
         title.setForeground(new Color(0x0057cc));
         title.setFont(titleFont);
 
-        JLabel header1 = new JLabel("A.I. JEOPARDY");
+        JLabel header1 = new JLabel("OS EDITION");
         Font biggerFont = customFont.deriveFont(Font.PLAIN, (int) (frameDimension.getHeight()/18.325));
         header1.setFont(biggerFont);
-        header1.setForeground(Color.black);
+
+        JLabel header2 = new JLabel("Every Wrong Guess Brings You Closer To Death...");
+        header2.setForeground(Color.black);
+        header2.setFont(biggerFont.deriveFont(15f));
 
         startButton = resourceManager.getImageIcon("Start Button");
         Image startButtonImageResized = startButton.getImage().getScaledInstance((int) (frameDimension.getWidth()/6.2), (int) (frameDimension.getHeight()/15.7), Image.SCALE_DEFAULT);
@@ -202,10 +205,12 @@ public class MainPagePanel extends JPanel implements MouseListener{
         lowerPanel.add(title, gbc);
 
         gbc.gridy = 1;
-        gbc.insets = new Insets((int) (frameDimension.getHeight()/24.5), 0, 0, 0);
+        gbc.insets = new Insets((int) (frameDimension.getHeight()/30), 0, 0, 0);
         lowerPanel.add(header1, gbc);
-        gbc.insets = new Insets((int) (frameDimension.getHeight()/14.7), 0, (int) (frameDimension.getHeight()/4.9), 0);
         gbc.gridy = 2;
+        lowerPanel.add(header2, gbc);
+        gbc.insets = new Insets((int) (frameDimension.getHeight()/14.7), 0, (int) (frameDimension.getHeight()/4.9), 0);
+        gbc.gridy = 3;
         lowerPanel.add(startButtonLabel, gbc);
     }
 
