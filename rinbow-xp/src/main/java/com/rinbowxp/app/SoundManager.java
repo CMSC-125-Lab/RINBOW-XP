@@ -63,7 +63,8 @@ public class SoundManager {
         /** Plays when the player guesses a wrong letter (unit takes damage). */
         EXPLOSION("explosion.wav"),
         /** Plays when the game ends in defeat. */
-        GAME_OVER("game_over.wav");
+        GAME_OVER("game_over.mp3"),
+        WIN("game_win.wav");
 
         final String fileName;
 
