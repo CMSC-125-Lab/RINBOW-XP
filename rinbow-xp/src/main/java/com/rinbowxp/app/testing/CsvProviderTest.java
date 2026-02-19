@@ -7,12 +7,12 @@ public class CsvProviderTest {
     public static void main(String[] args){
         WordProvider provider = new CsvWordProvider("../resources/word-dict/terms.csv");
         
-        IO.println("Loaded words: " + provider.allWords().size());
-        IO.println("----- SAMPLE WORDS -----");
+        System.out.println("Loaded words: " + provider.allWords().size());
+        System.out.println("----- SAMPLE WORDS -----");
 
         for (int i = 0; i < 5; i++){
             WordEntry w = provider.nextWord(Optional.of(Difficulty.EASY));
-            IO.println(w.term() + " -> " + w.clue());
+            System.out.println(w.term() + " -> " + w.clue());
         }
     }
 }

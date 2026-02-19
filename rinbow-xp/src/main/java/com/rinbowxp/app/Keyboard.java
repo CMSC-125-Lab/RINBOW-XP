@@ -55,9 +55,9 @@ public class Keyboard extends JPanel{
         gbc.gridy = 0;
         
         // Padding between each key in a single row
-        JPanel row1Panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 7, 0));
-        // Padding between Keyboard row and Keyboard JPanel border
-        row1Panel.setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0)); // Padding between Keyboard row and Keyboard JPanel border
+        JPanel row1Panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+        // Padding between Keyboard row and Keyboard JPanel border (scaled 3 -> 2)
+        row1Panel.setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
         row1Panel.setOpaque(false);
         for (int i = 0; i < row1.length(); i++) {
             JButton button = createKeyButton(row1.charAt(i));
@@ -66,9 +66,9 @@ public class Keyboard extends JPanel{
         keyboardPanel.add(row1Panel, gbc);
 
         // Padding between each key in a single row
-        JPanel row2Panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 7, 0));
-        // Padding between Keyboard row and Keyboard JPanel border (Also padding between row 1 and row 2)
-        row2Panel.setBorder(BorderFactory.createEmptyBorder(10, 13, 0, 0));
+        JPanel row2Panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+        // Padding between Keyboard row and Keyboard JPanel border (Also padding between row 1 and row 2) (10->8, 13->10)
+        row2Panel.setBorder(BorderFactory.createEmptyBorder(8, 10, 0, 0));
         row2Panel.setOpaque(false);
         for (int i = 0; i < row2.length(); i++) {
             JButton button = createKeyButton(row2.charAt(i));
@@ -78,9 +78,9 @@ public class Keyboard extends JPanel{
         keyboardPanel.add(row2Panel, gbc);
 
         // Padding between each key in a single row
-        JPanel row3Panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 9, 0));
-        // Padding between Keyboard row and Keyboard JPanel border (Also padding between row 2 and row 3)
-        row3Panel.setBorder(BorderFactory.createEmptyBorder(12, 38, 0, 0));
+        JPanel row3Panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 7, 0));
+        // Padding between Keyboard row and Keyboard JPanel border (Also padding between row 2 and row 3) (12->10, 38->30)
+        row3Panel.setBorder(BorderFactory.createEmptyBorder(10, 30, 0, 0));
         row3Panel.setOpaque(false);
         for (int i = 0; i < row3.length(); i++) {
             JButton button = createKeyButton(row3.charAt(i));
@@ -142,10 +142,11 @@ public class Keyboard extends JPanel{
         };
         
         if ("zxcvbnm".contains(Character.toString(keyChar).toLowerCase())) {
-            System.out.print("Key: " + keyChar + " - ");
-            button.setPreferredSize(new java.awt.Dimension(44,44));
+            // 44 * 0.8 = 35.2 -> 35
+            button.setPreferredSize(new java.awt.Dimension(35, 35));
         } else {
-            button.setPreferredSize(new java.awt.Dimension(45, 45));
+            // 45 * 0.8 = 36
+            button.setPreferredSize(new java.awt.Dimension(36, 36));
         }
         
         button.setContentAreaFilled(false);
@@ -202,6 +203,16 @@ public class Keyboard extends JPanel{
 
     public void setGameSession(GameSession gameSession) {
         this.gameSession = gameSession;
+    }
+    
+    public void setKeysActive(boolean active) {
+        for (JButton button : keyButtons.values()) {
+            boolean isPressed = Boolean.TRUE.equals(button.getClientProperty("pressed"));
+            // Only change the enabled state if the key hasn't been guessed yet
+            if (!isPressed) {
+                button.setEnabled(active);
+            }
+        }
     }
 
 }
