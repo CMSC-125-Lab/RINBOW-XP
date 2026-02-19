@@ -123,6 +123,7 @@ public class GameSession {
             System.out.println("=================================\n");
             gameResultPage.setGameResult(true, secretWord, wrongCount, rules.getMaxWrongAttempts());
             cardLayout.show(cardPanel, "Game Result Page");
+            resetRound();// Reset status for next game
         } else if (status == GameStatus.LOST) {
             System.out.println("\n=================================");
             System.out.println("💀 GAME OVER! YOU LOST! 💀");
@@ -130,10 +131,16 @@ public class GameSession {
             System.out.println("Wrong attempts: " + wrongCount + "/" + rules.getMaxWrongAttempts());
             System.out.println("=================================\n");
             SoundManager.getInstance().playSFX(SoundManager.SFX.GAME_OVER);
-            gameResultPage.setGameResult(false, secretWord, wrongCount, rules.getMaxWrongAttempts());
-            cardLayout.show(cardPanel, "Game Result Page");
+            // Defer showing Game Over panel until SpriteTransition's linger completes
+            spriteTransition.setOnFinalStageReady(new Runnable() {
+                @Override
+                public void run() {
+                    gameResultPage.setGameResult(false, secretWord, wrongCount, rules.getMaxWrongAttempts());
+                    cardLayout.show(cardPanel, "Game Result Page");
+                    resetRound();// Reset status for next game
+                }
+            });
         }
-        resetRound();// Reset status for next game
     }
     
     /**

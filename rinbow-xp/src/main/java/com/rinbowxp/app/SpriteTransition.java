@@ -7,146 +7,146 @@ import java.awt.event.ActionListener;
 
 public class SpriteTransition {
     private ResourceManager resourceManager;
-    private int currentStage = 0;  // 0-8
-    private int currentFrame = -1;  // -1 for stage GIF, 0-7 for transition frames
+    private int currentStage = 0;       // 0-8
     private static final int TOTAL_STAGES = 9;
-    private static final int FRAMES_PER_TRANSITION = 8;
-    
-    private boolean isTransitioning = false;  // Is currently playing transition frames
+    private static final int TRANSITION_DISPLAY_MS = 1400; // how long transitionX.gif is shown
+    private static final int FINAL_STAGE_LINGER_MS = 3000; // how long stage8.gif is shown before game over
+
+    private boolean isTransitioning = false;
     private Timer transitionTimer;
-    private int transitionSpeed = 2;  // milliseconds between frames
-    private Runnable onFrameChange;  // Callback to repaint when frame changes
+    private Runnable onFrameChange;
+
+    // Called once after stage8.gif has been shown for FINAL_STAGE_LINGER_MS.
+    // GameSession sets this to the lambda that navigates to the Game Over panel.
+    private Runnable onFinalStageReady;
+
+    private enum DisplayMode { STAGE, TRANSITION }
+    private DisplayMode displayMode = DisplayMode.STAGE;
 
     public SpriteTransition(ResourceManager resourceManager) {
         this.resourceManager = resourceManager;
     }
 
-    /**
-     * Set callback to be called when the displayed image changes
-     */
     public void setOnFrameChange(Runnable callback) {
         this.onFrameChange = callback;
     }
 
-    /**
-     * Set the speed of transition animation (milliseconds between frames)
-     */
-    public void setTransitionSpeed(int speedMs) {
-        this.transitionSpeed = speedMs;
-        // If a transition is currently running, apply the new delay immediately
-        if (transitionTimer != null && transitionTimer.isRunning()) {
-            transitionTimer.setDelay(this.transitionSpeed);
-        }
+    public void setOnFinalStageReady(Runnable callback) {
+        this.onFinalStageReady = callback;
     }
 
-    /**
-     * Get the current image (either a stage GIF or transition frame)
-     */
     public ImageIcon getCurrentImage() {
         try {
-            if (currentFrame == -1) {
-                // Show stage GIF
-                String stageName = "stage" + currentStage;
-                System.out.println("Showing: " + stageName + ".gif");
-                return resourceManager.getImageIcon(stageName);
+            if (displayMode == DisplayMode.TRANSITION) {
+                String key = "transition" + currentStage;
+                System.out.println("[SpriteTransition] Showing: " + key + ".gif");
+                return resourceManager.getImageIcon(key);
             } else {
-                // Show transition frame
-                String transitionName = "transition-" + currentStage + "/stage" + currentStage + "_f" + (currentFrame + 1);
-                System.out.println("Showing transition frame: " + transitionName + ".png");
-                return resourceManager.getImageIcon(transitionName);
+                String key = "stage" + currentStage;
+                System.out.println("[SpriteTransition] Showing: " + key + ".gif");
+                return resourceManager.getImageIcon(key);
             }
         } catch (Exception e) {
-            System.err.println("Failed to load sprite - Stage: " + currentStage + ", Frame: " + currentFrame);
+            System.err.println("[SpriteTransition] Failed to load - stage=" + currentStage + ", mode=" + displayMode);
             System.err.println("Error: " + e.getMessage());
             return null;
         }
     }
 
-    /**
-     * Start the transition sequence:
-     * 1. Play all 8 frames from transition-X folder (one by one with delay)
-     * 2. Then switch to stage(X+1).gif
-     */
     public void next() {
         if (isTransitioning) {
-            System.out.println("Already transitioning, ignoring next() call");
+            System.out.println("[SpriteTransition] Already transitioning, ignoring next() call");
             return;
         }
 
-        System.out.println("Starting transition from stage" + currentStage);
-        isTransitioning = true;
-        currentFrame = 0;  // Start at first transition frame
-        
-        // Stop any existing timer
         if (transitionTimer != null) {
             transitionTimer.stop();
+            transitionTimer = null;
         }
 
-        // Create timer to advance frames
-        transitionTimer = new Timer(transitionSpeed, new ActionListener() {
+        // If already at final stage, linger before firing game over
+        if (currentStage == TOTAL_STAGES - 1 && onFinalStageReady != null) {
+            System.out.println("[SpriteTransition] Already at final stage. Waiting " + FINAL_STAGE_LINGER_MS + "ms before game over...");
+            isTransitioning = true;
+            displayMode = DisplayMode.STAGE;
+            fireFrameChange();
+            Timer lingerTimer = new Timer(FINAL_STAGE_LINGER_MS, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent ev) {
+                    ((Timer) ev.getSource()).stop();
+                    isTransitioning = false;
+                    System.out.println("[SpriteTransition] Linger complete. Firing onFinalStageReady.");
+                    onFinalStageReady.run();
+                }
+            });
+            lingerTimer.setRepeats(false);
+            lingerTimer.start();
+            return;
+        }
+
+        System.out.println("[SpriteTransition] Starting transition from stage" + currentStage);
+        isTransitioning = true;
+        displayMode = DisplayMode.TRANSITION;
+
+        // Step 1: show transitionX.gif immediately
+        fireFrameChange();
+
+        // Step 2: after TRANSITION_DISPLAY_MS, advance to the next stage GIF
+        transitionTimer = new Timer(TRANSITION_DISPLAY_MS, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                currentFrame++;
+                ((Timer) e.getSource()).stop();
+                transitionTimer = null;
 
-                if (currentFrame >= FRAMES_PER_TRANSITION) {
-                    // Finished all transition frames, move to next stage GIF
-                    currentFrame = -1;
-                    currentStage = (currentStage + 1) % TOTAL_STAGES;
-                    isTransitioning = false;
-                    ((Timer) e.getSource()).stop();
-                    System.out.println("Transition complete! Now showing stage" + currentStage + ".gif");
-                } else {
-                    System.out.println("Transition frame " + (currentFrame + 1) + "/8");
-                }
+                currentStage = (currentStage + 1) % TOTAL_STAGES;
+                displayMode = DisplayMode.STAGE;
+                isTransitioning = false;
 
-                // Notify to repaint
-                if (onFrameChange != null) {
-                    onFrameChange.run();
+                System.out.println("[SpriteTransition] Transition complete! Now showing stage" + currentStage + ".gif");
+                fireFrameChange();
+
+                // Step 3: if this is the final stage (stage8), linger then fire game-over callback
+                if (currentStage == TOTAL_STAGES - 1 && onFinalStageReady != null) {
+                    System.out.println("[SpriteTransition] Final stage reached. Waiting " + FINAL_STAGE_LINGER_MS + "ms before game over...");
+                    Timer lingerTimer = new Timer(FINAL_STAGE_LINGER_MS, new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent ev) {
+                            ((Timer) ev.getSource()).stop();
+                            System.out.println("[SpriteTransition] Linger complete. Firing onFinalStageReady.");
+                            onFinalStageReady.run();
+                        }
+                    });
+                    lingerTimer.setRepeats(false);
+                    lingerTimer.start();
                 }
             }
         });
-        // Ensure the timer starts immediately and uses the current delay
-        transitionTimer.setInitialDelay(0);
-        transitionTimer.setDelay(transitionSpeed);
-        transitionTimer.setRepeats(true);
+        transitionTimer.setRepeats(false);
         transitionTimer.start();
-
-        // Initial repaint
-        if (onFrameChange != null) {
-            onFrameChange.run();
-        }
     }
 
-    /**
-     * Get the current stage (0-8)
-     */
+    public void reset() {
+        if (transitionTimer != null) {
+            transitionTimer.stop();
+            transitionTimer = null;
+        }
+        currentStage = 0;
+        displayMode = DisplayMode.STAGE;
+        isTransitioning = false;
+        System.out.println("[SpriteTransition] Reset to stage0.");
+    }
+
     public int getCurrentStage() {
         return currentStage;
     }
 
-    /**
-     * Get the current frame (-1 for stage GIF, 0-7 for transition frames)
-     */
-    public int getCurrentFrame() {
-        return currentFrame;
-    }
-
-    /**
-     * Check if currently transitioning
-     */
     public boolean isTransitioning() {
         return isTransitioning;
     }
 
-    /**
-     * Reset to stage 0
-     */
-    public void reset() {
-        if (transitionTimer != null) {
-            transitionTimer.stop();
+    private void fireFrameChange() {
+        if (onFrameChange != null) {
+            onFrameChange.run();
         }
-        currentStage = 0;
-        currentFrame = -1;
-        isTransitioning = false;
     }
 }

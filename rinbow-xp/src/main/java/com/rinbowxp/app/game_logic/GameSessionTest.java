@@ -54,7 +54,7 @@ public class GameSessionTest {
             System.out.println("💀 Game Over! You LOST!");
         }
 
-        IO.println(game.getSecretWord());
+        System.out.println(game.getSecretWord());
         
         System.out.println("Wrong attempts: " + game.getWrongCount() + "/" + game.getMaxWrongAttempts());
         
