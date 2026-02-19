@@ -232,12 +232,12 @@ public class SettingsPage extends JPanel implements MouseListener{
         volumeSlider.setOpaque(false);
         volumeSlider.setPreferredSize(new Dimension((int) (frameDimension.getWidth() / 3.5), (int) (frameDimension.getHeight() / 20)));
         
-        // Add a ChangeListener to update the volume as the slider moves
+        // Add a ChangeListener to update both BGM and SFX volume as the slider moves
         volumeSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 newVolume = volumeSlider.getValue() / 100.0f;
-                // Here you would set the volume of your audio system to newVolume
+                SoundManager.getInstance().setMasterVolume(newVolume);
                 System.out.println("Volume set to: " + newVolume);
             }
         });
@@ -312,29 +312,29 @@ public class SettingsPage extends JPanel implements MouseListener{
                 }
             }
         } if (e.getSource() == toggleSound) {
-            if (muted) {
-                toggleSound.setText("TOGGLE BG MUSIC: ON");
-                // AudioPlayer.setBgmVolume(newVolume);
-            } else {
-                toggleSound.setText("TOGGLE BG MUSIC: OFF");
-                // AudioPlayer.setBgmVolume(0);
-            }
-            muted = !muted;
+            boolean nowEnabled = !SoundManager.getInstance().isBGMEnabled();
+            SoundManager.getInstance().setBGMEnabled(nowEnabled);
+            toggleSound.setText("TOGGLE BG MUSIC: " + (nowEnabled ? "ON" : "OFF"));
+            muted = !nowEnabled;
         } else if (e.getSource() == toggleSoundFX) {
-            if (mutedFX) {
-                toggleSoundFX.setText("TOGGLE SOUND FX: ON");
-                // AudioPlayer.setVolume(newVolume);
-            } else {
-                toggleSoundFX.setText("TOGGLE SOUND FX: OFF");
-                // AudioPlayer.setVolume(0);
-            }
-            mutedFX = !mutedFX;
+            boolean nowEnabled = !SoundManager.getInstance().isSFXEnabled();
+            SoundManager.getInstance().setSFXEnabled(nowEnabled);
+            toggleSoundFX.setText("TOGGLE SOUND FX: " + (nowEnabled ? "ON" : "OFF"));
+            mutedFX = !nowEnabled;
         }
 
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
+        if (e.getSource() == homePageButton
+                || e.getSource() == contentPageButton
+                || e.getSource() == contactPageButton
+                || e.getSource() == settingsButton
+                || e.getSource() == toggleSound
+                || e.getSource() == toggleSoundFX) {
+            SoundManager.getInstance().playSFX(SoundManager.SFX.KEY_TYPE);
+        }
     }
 
     @Override

@@ -196,6 +196,10 @@ public class ChooseDifficultyPage extends JPanel implements MouseListener{
         easyButton.setContentAreaFilled(false);
         easyButton.setFocusPainted(false);
         easyButton.addMouseListener(this);
+        easyButton.addActionListener(e ->{
+            SoundManager.getInstance().playSFX(SoundManager.SFX.KEY_TYPE);
+            startGameWithDifficulty("EASY");
+        });
 
         mediumButton = new JButton("Medium", difficultyOptionButton);
         mediumButton.setHorizontalTextPosition(JButton.CENTER);
@@ -206,6 +210,10 @@ public class ChooseDifficultyPage extends JPanel implements MouseListener{
         mediumButton.setContentAreaFilled(false);
         mediumButton.setFocusPainted(false);
         mediumButton.addMouseListener(this);
+        mediumButton.addActionListener(e ->{
+            SoundManager.getInstance().playSFX(SoundManager.SFX.KEY_TYPE);
+            startGameWithDifficulty("MEDIUM");
+        });
 
         hardButton = new JButton("Hard", difficultyOptionButton);
         hardButton.setHorizontalTextPosition(JButton.CENTER);
@@ -216,6 +224,10 @@ public class ChooseDifficultyPage extends JPanel implements MouseListener{
         hardButton.setContentAreaFilled(false);
         hardButton.setFocusPainted(false);
         hardButton.addMouseListener(this);
+        hardButton.addActionListener(e ->{
+            SoundManager.getInstance().playSFX(SoundManager.SFX.KEY_TYPE);
+            startGameWithDifficulty("HARD");
+        });
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -306,8 +318,22 @@ public class ChooseDifficultyPage extends JPanel implements MouseListener{
 
     }
 
+    private void startGameWithDifficulty(String diff){
+        gamePanel.createNewGame(diff);
+        cardLayout.show(cardPanel, "Game Panel");
+    }
+
     @Override
     public void mousePressed(MouseEvent e) {
+        if (e.getSource() == easyButton
+                || e.getSource() == mediumButton
+                || e.getSource() == hardButton
+                || e.getSource() == homePageButton
+                || e.getSource() == contentPageButton
+                || e.getSource() == contactPageButton
+                || e.getSource() == settingsButton) {
+            SoundManager.getInstance().playSFX(SoundManager.SFX.KEY_TYPE);
+        }
     }
 
     @Override

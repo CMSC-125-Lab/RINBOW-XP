@@ -158,6 +158,8 @@ public class Keyboard extends JPanel{
         
         // Add action to update word display when letter is clicked
         button.addActionListener(e -> {
+            // Play key-press SFX on every button interaction.
+            SoundManager.getInstance().playSFX(SoundManager.SFX.KEY_TYPE);
             // Check if letter is in the word using GameSession
             if (gameSession != null) {
                 gameSession.makeGuess(String.valueOf(keyChar));

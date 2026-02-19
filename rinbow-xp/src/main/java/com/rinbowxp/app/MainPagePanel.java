@@ -232,7 +232,7 @@ public class MainPagePanel extends JPanel implements MouseListener{
     @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getSource() == startButtonLabel) {
-           cardLayout.show(cardPanel, "Choose Difficulty Page");
+            cardLayout.show(cardPanel, "Choose Difficulty Page");
         }
         else if (e.getSource() == minimizeButtonLabel) {
             System.out.println("Minimize Button Pressed");
@@ -273,6 +273,13 @@ public class MainPagePanel extends JPanel implements MouseListener{
 
     @Override
     public void mousePressed(MouseEvent e) {
+        if (e.getSource() == startButtonLabel
+                || e.getSource() == homePageButton
+                || e.getSource() == contentPageButton
+                || e.getSource() == contactPageButton
+                || e.getSource() == settingsButton) {
+            SoundManager.getInstance().playSFX(SoundManager.SFX.KEY_TYPE);
+        }
     }
 
     @Override

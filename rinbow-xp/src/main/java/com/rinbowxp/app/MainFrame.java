@@ -13,6 +13,10 @@ public class MainFrame extends JFrame{
     public MainFrame() {
         setup();
         resourceManager = new ResourceManager();
+
+        // Initialise SoundManager and start looping background music.
+        SoundManager.getInstance().playBGM();
+
         CardLayout cardLayout = new CardLayout();
         JPanel cardPanel = getCardPanel(cardLayout);
 

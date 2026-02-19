@@ -7,5 +7,5 @@ public class App {
         javax.swing.SwingUtilities.invokeLater(MainFrame::new);
         System.out.println( "Hello World!" );
     }
-    
+
 }

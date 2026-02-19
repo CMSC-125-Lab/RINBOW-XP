@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.swing.JPanel;
 
 import com.rinbowxp.app.GameResultPage;
+import com.rinbowxp.app.SoundManager;
 import com.rinbowxp.app.SpriteTransition;
 import com.rinbowxp.app.word.*;
 
@@ -69,12 +70,14 @@ public class GameSession {
         
         if (secretWord.contains(letter)) {
             System.out.println(letter + " is CORRECT! It's in the word.");
+            SoundManager.getInstance().playSFX(SoundManager.SFX.CORRECT_GUESS);
             updateStatus();
             return true;
         } else {
             wrongCount++;
             damageLevel++;
             spriteTransition.next();
+            SoundManager.getInstance().playSFX(SoundManager.SFX.EXPLOSION);
             System.out.println(letter + " is WRONG! Not in the word. (" + wrongCount + "/" + rules.getMaxWrongAttempts() + " wrong attempts)");
             updateStatus();
             return false;
@@ -126,6 +129,7 @@ public class GameSession {
             System.out.println("The word was: " + secretWord);
             System.out.println("Wrong attempts: " + wrongCount + "/" + rules.getMaxWrongAttempts());
             System.out.println("=================================\n");
+            SoundManager.getInstance().playSFX(SoundManager.SFX.GAME_OVER);
             gameResultPage.setGameResult(false, secretWord, wrongCount, rules.getMaxWrongAttempts());
             cardLayout.show(cardPanel, "Game Result Page");
         }

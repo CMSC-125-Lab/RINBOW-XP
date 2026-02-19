@@ -290,6 +290,12 @@ public class RulesPage extends JPanel implements MouseListener{
 
     @Override
     public void mousePressed(MouseEvent e) {
+        if (e.getSource() == homePageButton
+                || e.getSource() == contentPageButton
+                || e.getSource() == contactPageButton
+                || e.getSource() == settingsButton) {
+            SoundManager.getInstance().playSFX(SoundManager.SFX.KEY_TYPE);
+        }
     }
 
     @Override
