@@ -24,6 +24,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -33,8 +34,8 @@ public class GamePanel extends JPanel implements MouseListener {
     private JPanel cardPanel;
     private CardLayout cardLayout;
     private Image bg_image;
-    private JPanel upperPanel, lowerPanel, footerPanel;
-    private JLabel title, homePageButton, exitButtonLabel, minimizeButtonLabel, gamedescriptionButton, clueLabel;
+    private JPanel upperPanel, lowerPanel, footerPanel, contentPanel;
+    private JLabel title, homePageButton, clueButton, exitButtonLabel, minimizeButtonLabel, gamedescriptionButton, clueLabel;
     private Font customFont = new Font("Arial", Font.PLAIN, 21);
     private Font boldCustomFont = new Font("Arial", Font.BOLD, 21);
     private Font titleFont = new Font("Arial", Font.BOLD, 56);
@@ -47,6 +48,9 @@ public class GamePanel extends JPanel implements MouseListener {
     private JButton spriteButton;
     private GameSession gameSession;
     private JLabel wordDisplayLabel;
+    private JPanel clueOverlay;
+    private JLabel clueOverlayText;
+    private JLayeredPane layeredPane;
 
     public GamePanel(CardLayout cardLayout, JPanel cardPanel, GameResultPage gameResultPage, ResourceManager resourceManager,
                      Dimension frameDimension) {
@@ -64,8 +68,6 @@ public class GamePanel extends JPanel implements MouseListener {
         // Initialize game session
         gameSession = new GameSession(cardLayout, cardPanel, gameResultPage, spriteTransition);
 
-        this.setLayout(new BorderLayout());
-
         customFont = resourceManager.getCousineRegular();
         customFont = customFont.deriveFont(Font.PLAIN, (int) frameDimension.getHeight() / 25);
         boldCustomFont = resourceManager.getCousineBold();
@@ -73,13 +75,57 @@ public class GamePanel extends JPanel implements MouseListener {
         titleFont = resourceManager.getAnonymousProBold();
         titleFont = titleFont.deriveFont(Font.BOLD, (int) frameDimension.getHeight() / 10);
 
+        // Setup main layout
+        this.setLayout(new BorderLayout());
+        
+        // Create layered pane for content and overlay
+        layeredPane = new JLayeredPane();
+        layeredPane.setPreferredSize(frameDimension);
+        
+        // Create content panel with main UI
+        contentPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.drawImage(bg_image, 0, 0, getWidth(), getHeight(), GamePanel.this);
+            }
+        };
+        contentPanel.setLayout(new BorderLayout());
+        contentPanel.setOpaque(false);
+
         setUpperPanel();
         setLowerPanel();
         setFooterPanel();
 
-        add(upperPanel, BorderLayout.NORTH);
-        add(lowerPanel, BorderLayout.CENTER);
-        add(footerPanel, BorderLayout.SOUTH);
+        contentPanel.add(upperPanel, BorderLayout.NORTH);
+        contentPanel.add(lowerPanel, BorderLayout.CENTER);
+        contentPanel.add(footerPanel, BorderLayout.SOUTH);
+        
+        // Add content panel to layered pane
+        contentPanel.setBounds(0, 0, (int)frameDimension.getWidth(), (int)frameDimension.getHeight());
+        layeredPane.add(contentPanel, JLayeredPane.DEFAULT_LAYER);
+        
+        setupClueOverlay();
+        
+        // Add layered pane to this panel
+        add(layeredPane, BorderLayout.CENTER);
+    }
+    
+    @Override
+    public void doLayout() {
+        super.doLayout();
+        if (layeredPane != null && contentPanel != null) {
+            int width = layeredPane.getWidth();
+            int height = layeredPane.getHeight();
+            contentPanel.setBounds(0, 0, width, height);
+            if (clueOverlay != null) {
+                clueOverlay.setBounds(0, 0, width, height);
+            }
+        }
     }
 
     private void setUpperPanel() {
@@ -97,6 +143,11 @@ public class GamePanel extends JPanel implements MouseListener {
         homePageButton.setForeground(java.awt.Color.black);
         homePageButton.setFont(customFont);
         homePageButton.addMouseListener(this);
+
+        clueButton = new JLabel("Clue");
+        clueButton.setForeground(java.awt.Color.black);
+        clueButton.setFont(customFont);
+        clueButton.addMouseListener(this);
 
         exitButton = resourceManager.getImageIcon("Exit Button");
         Image exitButtonResized = exitButton.getImage().getScaledInstance((int) frameDimension.getWidth() / 25, (int) frameDimension.getWidth() / 25, Image.SCALE_DEFAULT);
@@ -123,7 +174,7 @@ public class GamePanel extends JPanel implements MouseListener {
         JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 0));
         navPanel.setOpaque(false);
         navPanel.add(homePageButton);
-
+        navPanel.add(clueButton);
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.NONE;
 
@@ -162,6 +213,72 @@ public class GamePanel extends JPanel implements MouseListener {
         );
         upperPanel.add(navPanel, gbc);
         upperPanel.setBorder(BorderFactory.createEmptyBorder((int) (frameDimension.getHeight() / 45), 0, 0, 0));
+    }
+
+    private void setupClueOverlay() {
+        // Create overlay panel with semi-transparent background
+        clueOverlay = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                // Draw semi-transparent background
+                g2d.setColor(new Color(0, 0, 0, 180));
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+            }
+        };
+        clueOverlay.setLayout(new GridBagLayout());
+        clueOverlay.setOpaque(false);
+        clueOverlay.setVisible(false);
+        clueOverlay.setBounds(0, 0, (int)frameDimension.getWidth(), (int)frameDimension.getHeight());
+        
+        // Create clue text label with styling
+        clueOverlayText = new JLabel();
+        clueOverlayText.setPreferredSize(new Dimension(800, 400)); 
+        clueOverlayText.setFont(boldCustomFont.deriveFont(32f));
+        clueOverlayText.setForeground(Color.WHITE);
+        clueOverlayText.setHorizontalAlignment(JLabel.CENTER);
+        clueOverlayText.setBackground(new Color(0, 87, 204));
+        clueOverlayText.setOpaque(true);
+        clueOverlayText.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.WHITE, 3),
+                BorderFactory.createEmptyBorder(30, 50, 30, 50)
+        ));
+        
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        clueOverlay.add(clueOverlayText, gbc);
+        
+        // Add click-to-dismiss functionality
+        clueOverlay.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                hideClueOverlay();
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        
+        // Add overlay to layered pane on top layer
+        layeredPane.add(clueOverlay, JLayeredPane.PALETTE_LAYER);
+    }
+    
+    private void showClueOverlay() {
+        clueOverlayText.setText("<html><div style='text-align: center;'>" + gameSession.getClue() + "<br/><br/><span style='font-size: 18px;'>(Click anywhere to dismiss)</span></div></html>");
+        clueOverlay.setVisible(true);
+        clueOverlay.repaint();
+    }
+    
+    private void hideClueOverlay() {
+        clueOverlay.setVisible(false);
     }
 
     private void setLowerPanel() {
@@ -424,22 +541,6 @@ public class GamePanel extends JPanel implements MouseListener {
     }
 
     @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-
-        if (bg_image == null) {
-            System.out.println("Background Image failed to Load");
-            return;
-        }
-
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.drawImage(bg_image, 0, 0, getWidth(), getHeight(), this);
-    }
-
-    @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getSource() == minimizeButtonLabel) {
             System.out.println("Minimize Button Pressed");
@@ -452,6 +553,8 @@ public class GamePanel extends JPanel implements MouseListener {
             System.exit(0);
         } else if (e.getSource() == homePageButton) {
             cardLayout.show(cardPanel, "Home Page");
+        } else if (e.getSource() == clueButton) {
+            showClueOverlay();
         } else if (e.getSource() == title) {
             Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
             if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
@@ -469,6 +572,8 @@ public class GamePanel extends JPanel implements MouseListener {
     public void mousePressed(MouseEvent e) {
         if (e.getSource() == homePageButton) {
             SoundManager.getInstance().playSFX(SoundManager.SFX.KEY_TYPE);
+        } else if (e.getSource() == clueButton) {
+            SoundManager.getInstance().playSFX(SoundManager.SFX.KEY_TYPE);
         }
     }
 
@@ -480,8 +585,9 @@ public class GamePanel extends JPanel implements MouseListener {
     public void mouseEntered(MouseEvent e) {
         if (e.getSource() == homePageButton) {
             homePageButton.setFont(boldCustomFont);
-
-        }else if (e.getSource() == exitButtonLabel) {
+        } else if (e.getSource() == clueButton) {
+            clueButton.setFont(boldCustomFont);
+        } else if (e.getSource() == exitButtonLabel) {
             exitButtonLabel.setIcon(exitButtonClicked);
         }
         else if (e.getSource() == minimizeButtonLabel) {
@@ -494,8 +600,9 @@ public class GamePanel extends JPanel implements MouseListener {
     public void mouseExited(MouseEvent e) {
         if (e.getSource() == homePageButton){
             homePageButton.setFont(customFont);
-
-        }else if(e.getSource() == gamedescriptionButton){
+        } else if (e.getSource() == clueButton) {
+            clueButton.setFont(customFont);
+        } else if(e.getSource() == gamedescriptionButton){
             gamedescriptionButton.setFont(customFont);
         }
         else if (e.getSource() == exitButtonLabel) {
