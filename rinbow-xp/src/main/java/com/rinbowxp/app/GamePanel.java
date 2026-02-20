@@ -25,6 +25,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 
 import com.rinbowxp.app.game_logic.GameSession;
 
@@ -407,9 +408,15 @@ public class GamePanel extends JPanel implements MouseListener {
             wordDisplayLabel.setText(gameSession.getDisplayWord());
             clueLabel.setText(gameSession.getDifficulty());
             spriteButton.setIcon(spriteTransition.getCurrentImage());
-            keyboard.reset();
-            lowerPanel.revalidate();
-            lowerPanel.repaint();
+            
+            // Delay keyboard reset to allow any pending click events to finish processing
+            Timer resetTimer = new Timer(150, e -> {
+                keyboard.reset();
+                lowerPanel.revalidate();
+                lowerPanel.repaint();
+            });
+            resetTimer.setRepeats(false);
+            resetTimer.start();
         });
         
         lowerPanel.revalidate();
