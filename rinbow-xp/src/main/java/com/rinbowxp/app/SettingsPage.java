@@ -39,7 +39,6 @@ public class SettingsPage extends JPanel implements MouseListener{
     private JLabel toggleSound, toggleSoundFX;
     private JSlider volumeSlider;
     private float newVolume;
-    private boolean muted = false, mutedFX = false;
     
     private Dimension frameDimension;
 
@@ -315,12 +314,10 @@ public class SettingsPage extends JPanel implements MouseListener{
             boolean nowEnabled = !SoundManager.getInstance().isBGMEnabled();
             SoundManager.getInstance().setBGMEnabled(nowEnabled);
             toggleSound.setText("TOGGLE BG MUSIC: " + (nowEnabled ? "ON" : "OFF"));
-            muted = !nowEnabled;
         } else if (e.getSource() == toggleSoundFX) {
             boolean nowEnabled = !SoundManager.getInstance().isSFXEnabled();
             SoundManager.getInstance().setSFXEnabled(nowEnabled);
             toggleSoundFX.setText("TOGGLE SOUND FX: " + (nowEnabled ? "ON" : "OFF"));
-            mutedFX = !nowEnabled;
         }
 
     }
