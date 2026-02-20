@@ -205,7 +205,7 @@ public class RulesPage extends JPanel implements MouseListener{
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.insets = new Insets(0, 0, (int) frameDimension.getHeight() / 20, 0);
+        gbc.insets = new Insets(0, 0, (int) frameDimension.getHeight() / 30, 0);
         lowerPanel.add(title, gbc);
 
         gbc.gridy = 1;

@@ -36,7 +36,7 @@ public class GameSession {
      * Constructor initializes a new game session
      */
     public GameSession(CardLayout cardLayout, JPanel cardPanel, GameResultPage gameResultPage, SpriteTransition spriteTransition) {
-        this.provider = new CsvWordProvider("../resources/word-dict/terms.csv");
+        this.provider = new CsvWordProvider("/com/rinbowxp/app/resources/word-dict/terms.csv");
         this.word = provider.nextWord(Optional.of(Difficulty.EASY));
         this.secretWord = word.term();
         this.guessed = new HashSet<>();
