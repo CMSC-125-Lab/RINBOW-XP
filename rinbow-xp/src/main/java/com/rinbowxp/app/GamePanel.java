@@ -145,7 +145,7 @@ public class GamePanel extends JPanel implements MouseListener {
         homePageButton.addMouseListener(this);
 
         clueButton = new JLabel("Clue");
-        clueButton.setForeground(java.awt.Color.black);
+        clueButton.setForeground(new Color(0x0057cc));
         clueButton.setFont(customFont);
         clueButton.addMouseListener(this);
 
@@ -171,10 +171,15 @@ public class GamePanel extends JPanel implements MouseListener {
         minimizeButtonLabel = new JLabel(minimizeButton);
         minimizeButtonLabel.addMouseListener(this);
 
-        JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 0));
+        JPanel navPanel = new JPanel(new GridBagLayout());
         navPanel.setOpaque(false);
-        navPanel.add(homePageButton);
-        navPanel.add(clueButton);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(0, (int) (frameDimension.getWidth() / 45), 0, 0);
+        navPanel.add(homePageButton, gbc);
+        gbc.gridx = 1;
+        gbc.insets = new Insets(0, (int) (frameDimension.getWidth() / 1.48), 0, 0);
+        navPanel.add(clueButton, gbc);
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.NONE;
 
