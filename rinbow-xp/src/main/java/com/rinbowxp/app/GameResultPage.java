@@ -311,7 +311,6 @@ public class GameResultPage extends JPanel implements MouseListener{
                 }
             }
         }
-
     }
 
     @Override

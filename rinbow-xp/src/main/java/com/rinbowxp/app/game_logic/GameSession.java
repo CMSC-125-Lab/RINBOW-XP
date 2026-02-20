@@ -123,6 +123,7 @@ public class GameSession {
      */
     private void announceResult() {
         if (status == GameStatus.WON) {
+            SoundManager.getInstance().playSFX(SoundManager.SFX.WIN);
             System.out.println("\n=================================");
             System.out.println("🎉 ROUND " + currentRound + " WON! 🎉");
             System.out.println("The word was: " + secretWord);

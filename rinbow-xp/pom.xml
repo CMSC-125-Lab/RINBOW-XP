@@ -48,6 +48,12 @@
         <version>1.14.1</version>
     </dependency>
 
+    <!-- MP3 playback support via javax.sound.sampled (mp3spi + tritonus + JLayer) -->
+    <dependency>
+        <groupId>com.googlecode.soundlibs</groupId>
+        <artifactId>mp3spi</artifactId>
+        <version>1.9.5.4</version>
+    </dependency>
 
   </dependencies>
 
