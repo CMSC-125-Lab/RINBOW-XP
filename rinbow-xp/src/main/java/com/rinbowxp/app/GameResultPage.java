@@ -28,14 +28,14 @@ public class GameResultPage extends JPanel implements MouseListener{
     private CardLayout cardLayout;
     private Image bg_image;
     private JPanel upperPanel, lowerPanel;
-    private JLabel title, homePageButton, contentPageButton, contactPageButton, settingsButton, exitButtonLabel, minimizeButtonLabel, backToHomeLabel, secretLabel, wrongAttemptsLabel;
+    private JLabel title, homePageButton, contentPageButton, contactPageButton, settingsButton, exitButtonLabel, minimizeButtonLabel, backToHomeLabel, proceedNextRoundLabel, secretLabel, wrongAttemptsLabel;
     private Font customFont = new Font("Arial", Font.PLAIN, 21);
     private Font boldCustomFont = new Font("Arial", Font.BOLD, 21);
     private Font titleFont = new Font("Arial", Font.BOLD, 56);
     private ImageIcon exitButton, exitButtonClicked, minimizeButton, minimizeButtonClicked;
 
     private Dimension frameDimension;
-
+    private GamePanel gamePanel; // reference to refresh GamePanel on next round
     private ResourceManager resourceManager;
 
     private boolean gameResult = false; // false = loss, true = win
@@ -65,7 +65,9 @@ public class GameResultPage extends JPanel implements MouseListener{
         add(lowerPanel, BorderLayout.CENTER);
 
     }
-
+    public void setGamePanelReference(GamePanel gamePanel) {
+        this.gamePanel = gamePanel;
+    }
     private void setUpperPanel() {
         GridBagConstraints gbc = new GridBagConstraints();
         upperPanel = new JPanel();
@@ -167,6 +169,43 @@ public class GameResultPage extends JPanel implements MouseListener{
         upperPanel.add(navPanel, gbc);
     }
 
+    public void setRoundResult(String secretWord, int wrongAttempts, int maxWrongAttempts, int currentRound) {
+        lowerPanel.removeAll();
+        lowerPanel.setOpaque(false);
+        lowerPanel.setLayout(new GridBagLayout());
+
+        title = new JLabel("ROUND " + currentRound + " RESULT");
+        secretLabel = new JLabel();
+        wrongAttemptsLabel = new JLabel();
+        proceedNextRoundLabel = new JLabel("Proceed to Next Round");
+
+        title.setForeground(new Color(0x0057cc));
+        title.setFont(titleFont);
+        secretLabel.setFont(boldCustomFont);
+        secretLabel.setForeground(Color.darkGray);
+        wrongAttemptsLabel.setFont(customFont);
+        wrongAttemptsLabel.setForeground(Color.darkGray);
+        proceedNextRoundLabel.setFont(customFont.deriveFont(Font.PLAIN, (int) frameDimension.getHeight()/30));
+        proceedNextRoundLabel.setForeground(new Color(0x0057cc));
+        proceedNextRoundLabel.addMouseListener(this);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.insets = new Insets(0, 0, (int)(frameDimension.getHeight() / 20), 0);
+        lowerPanel.add(title, gbc);
+        secretLabel.setText("Secret Word: " + secretWord);
+        wrongAttemptsLabel.setText("Wrong Attempts: " + wrongAttempts + "/" + maxWrongAttempts);
+        gbc.gridy = 1;
+        lowerPanel.add(secretLabel, gbc);
+        gbc.gridy = 2;
+        lowerPanel.add(wrongAttemptsLabel, gbc);
+        gbc.gridy = 3;
+        gbc.insets = new Insets(0, 0, (int)(frameDimension.getHeight() / 5), 0);
+        lowerPanel.add(proceedNextRoundLabel, gbc);
+        lowerPanel.revalidate();
+        lowerPanel.repaint();
+    }
     public void setGameResult(boolean result, String secretWord, int wrongAttempts, int maxWrongAttempts) { // same as setting lowerpanel
         this.gameResult = result;
         lowerPanel.removeAll();
@@ -255,6 +294,10 @@ public class GameResultPage extends JPanel implements MouseListener{
             cardLayout.show(cardPanel, "Contact Page");
         } else if (e.getSource() == settingsButton) {
             cardLayout.show(cardPanel, "Settings Page");
+        } else if (e.getSource() == proceedNextRoundLabel) {
+            cardLayout.show(cardPanel, "Game Panel");
+            gamePanel.revalidate();
+            gamePanel.repaint();
         }
          else if (e.getSource() == title){
             Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
@@ -299,7 +342,10 @@ public class GameResultPage extends JPanel implements MouseListener{
 
         } else if (e.getSource() == backToHomeLabel) {
             backToHomeLabel.setFont(boldCustomFont.deriveFont(Font.PLAIN, (int) frameDimension.getHeight()/30));
-        } else if (e.getSource() == settingsButton) {
+        } else if (e.getSource() == proceedNextRoundLabel) {
+            proceedNextRoundLabel.setFont(boldCustomFont.deriveFont(Font.PLAIN, (int) frameDimension.getHeight()/30));
+        }
+        else if (e.getSource() == settingsButton) {
             settingsButton.setFont(boldCustomFont);
         }
         else if (e.getSource() == exitButtonLabel) {

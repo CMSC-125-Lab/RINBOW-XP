@@ -179,22 +179,15 @@ public class Keyboard extends JPanel{
     }
 
     public void reset() {
-        resetButtons(this);
-    }
-
-    private void resetButtons(Component component) {
-        if (component instanceof JButton) {
-            JButton button = (JButton) component;
+        // Reset all buttons from the keyButtons map directly
+        for (JButton button : keyButtons.values()) {
             button.setEnabled(true);
             button.putClientProperty("pressed", false);
+            button.getModel().setArmed(false);
+            button.getModel().setPressed(false);
+            button.getModel().setSelected(false);
+            button.getModel().setRollover(false);
             button.repaint();
-            return;
-        }
-
-        if (component instanceof JPanel) {
-            for (Component child : ((JPanel) component).getComponents()) {
-                resetButtons(child);
-            }
         }
     }
 

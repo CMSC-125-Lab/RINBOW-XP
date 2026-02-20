@@ -53,6 +53,7 @@ public class GamePanel extends JPanel implements MouseListener {
         this.cardPanel = cardPanel;
         this.resourceManager = resourceManager;
         this.frameDimension = frameDimension;
+        gameResultPage.setGamePanelReference(this);
 
         bg_image = resourceManager.getImageIcon("Contact Panel BG").getImage();
 
@@ -86,7 +87,7 @@ public class GamePanel extends JPanel implements MouseListener {
         upperPanel.setOpaque(false);
         upperPanel.setLayout(new GridBagLayout());
 
-        title = new JLabel("RINBOWS XP OS");
+        title = new JLabel(gameSession.getCurrentRound() > 0 ? "Round " + gameSession.getCurrentRound() : "Type Or Die");
         title.setForeground(java.awt.Color.lightGray);
         title.setFont(boldCustomFont);
         title.addMouseListener(this);
@@ -391,6 +392,7 @@ public class GamePanel extends JPanel implements MouseListener {
 
     public void createNewGame(String difficulty) {
         gameSession.startNewGame(difficulty);
+        title.setText("Round " + gameSession.getCurrentRound());
         wordDisplayLabel.setText(gameSession.getDisplayWord());
         clueLabel.setText(gameSession.getDifficulty());
         spriteTransition.reset();
@@ -398,6 +400,18 @@ public class GamePanel extends JPanel implements MouseListener {
         keyboard.reset();
         keyboard.setGameSession(gameSession);
         keyboard.setWordDisplayLabel(wordDisplayLabel);
+        
+        // Register callback for next round transitions
+        gameSession.setOnNextRoundReady(() -> {
+            title.setText("Round " + gameSession.getCurrentRound());
+            wordDisplayLabel.setText(gameSession.getDisplayWord());
+            clueLabel.setText(gameSession.getDifficulty());
+            spriteButton.setIcon(spriteTransition.getCurrentImage());
+            keyboard.reset();
+            lowerPanel.revalidate();
+            lowerPanel.repaint();
+        });
+        
         lowerPanel.revalidate();
         lowerPanel.repaint();
     }
